@@ -3,10 +3,17 @@ const cors = require('cors');
 const app = express();
 
 app.use(cors());
+app.use(express.json());
 
-// API endpoints will go here
+// Routes
+app.get('/properties', (req, res) => {
+  // Logic to fetch property listings
+});
 
-const PORT = process.env.PORT || 3000;
-app.listen(PORT, () => {
-  console.log(`Server is running on port ${PORT}`);
+app.post('/contact', (req, res) => {
+  // Logic to handle contact form submission
+});
+
+app.listen(3000, () => {
+  console.log('Server is running on http://localhost:3000');
 });
