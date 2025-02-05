@@ -1,13 +1,13 @@
 {
-  "name": "portfolio-website",
+  "name": "real-estate-website",
   "version": "1.0.0",
-  "description": "Portfolio Website using Node.js and Express.js",
+  "description": "Sleek and modern real estate website",
   "main": "server.js",
-  "scripts": {
-    "start": "node server.js"
-  },
   "dependencies": {
     "express": "^4.17.1",
     "cors": "^2.8.5"
+  },
+  "scripts": {
+    "start": "node server.js"
   }
 }
