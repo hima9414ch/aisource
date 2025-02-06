@@ -1,7 +1,7 @@
 {
-  "name": "ai-source-backend",
+  "name": "portfolio-website",
   "version": "1.0.0",
-  "description": "Backend server for AI Source frontend",
+  "description": "Portfolio Website Backend",
   "main": "server.js",
   "scripts": {
     "start": "node server.js"
