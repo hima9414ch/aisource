@@ -1,7 +1,7 @@
 {
-  "name": "ai-source-app",
+  "name": "ai-source-backend",
   "version": "1.0.0",
-  "description": "AI Source Website Backend",
+  "description": "Backend server for AI Source frontend",
   "main": "server.js",
   "scripts": {
     "start": "node server.js"
