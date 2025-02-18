@@ -1,45 +1,40 @@
 /**
- * API Endpoints Summary
+ * Real Estate API Endpoints Summary
  *
  * 1. GET /properties
- *    - Description: Retrieve all properties with optional filtering
- *    - Query Parameters:
- *      - city (optional): Filter by city
- *      - minPrice (optional): Filter by minimum price
- *      - maxPrice (optional): Filter by maximum price
+ *    - Description: Retrieve all properties
+ *    - Parameters: None
  *    - Response: Array of property objects
  *
- * 2. POST /properties
- *    - Description: Add a new property
- *    - Authentication: Required (JWT token in Authorization header)
- *    - Request Body: Property object with title, description, price, address, contact email
- *    - Response: Created property object with ID
+ * 2. GET /properties/:id
+ *    - Description: Retrieve a specific property
+ *    - Parameters: id (URL parameter)
+ *    - Response: Single property object
  *
- * 3. GET /properties/:id
- *    - Description: Get specific property by ID
- *    - Parameters: property ID
- *    - Response: Property object
+ * 3. POST /properties
+ *    - Description: Create a new property
+ *    - Authentication: Required (JWT token in Authorization header)
+ *    - Request Body: {
+ *        address: string,
+ *        price: number,
+ *        description: string
+ *      }
+ *    - Response: Created property object
  *
  * 4. PUT /properties/:id
- *    - Description: Update specific property
+ *    - Description: Update an existing property
  *    - Authentication: Required (JWT token in Authorization header)
- *    - Parameters: property ID
- *    - Request Body: Updated property fields
+ *    - Parameters: id (URL parameter)
+ *    - Request Body: {
+ *        address?: string,
+ *        price?: number,
+ *        description?: string
+ *      }
  *    - Response: Updated property object
  *
  * 5. DELETE /properties/:id
- *    - Description: Delete specific property
+ *    - Description: Delete a property
  *    - Authentication: Required (JWT token in Authorization header)
- *    - Parameters: property ID
+ *    - Parameters: id (URL parameter)
  *    - Response: 204 No Content
- *
- * 6. POST /users/register
- *    - Description: Register new user
- *    - Request Body: { email, password }
- *    - Response: { token: JWT_TOKEN }
- *
- * 7. POST /users/login
- *    - Description: Authenticate user
- *    - Request Body: { email, password }
- *    - Response: { token: JWT_TOKEN }
  */
