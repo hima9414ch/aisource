@@ -1,8 +1,14 @@
 {
-  "name": "simple-server",
+  "name": "real-estate-api",
   "version": "1.0.0",
+  "description": "Real Estate API",
   "main": "server.js",
+  "scripts": {
+    "start": "node server.js"
+  },
   "dependencies": {
-    "express": "^4.17.1"
+    "express": "^4.17.1",
+    "cors": "^2.8.5",
+    "jsonwebtoken": "^8.5.1"
   }
 }
