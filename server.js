@@ -1,1 +1,14 @@
-/* Your backend logic using Node.js with Express.js */
+const express = require('express');
+const app = express();
+const port = 3000;
+
+app.use(express.json());
+
+app.post('/api/data', (req, res) => {
+  const data = req.body;
+  res.json({ message: 'Data received', data });
+});
+
+app.listen(port, () => {
+  console.log(`Server running on port ${port}`);
+});
