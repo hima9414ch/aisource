@@ -6,118 +6,88 @@ const app = express();
 app.use(cors());
 app.use(express.json());
 
-const JWT_SECRET = 'your-secret-key';
+const JWT_SECRET = process.env.JWT_SECRET || 'your-secret-key';
 
-// In-memory storage
+// Mock database
 let properties = [];
-let users = [];
+const adminUser = { username: 'admin', password: 'admin123' };
 
-// Middleware for authentication
-const isAuthenticated = (req, res, next) => {
-    try {
-        const token = req.headers.authorization?.split(' ')[1];
-        if (!token) {
-            return res.status(401).json({ error: 'No token provided' });
-        }
-        const decoded = jwt.verify(token, JWT_SECRET);
-        req.user = decoded;
+// Middleware for JWT verification
+const authenticateToken = (req, res, next) => {
+    const authHeader = req.headers['authorization'];
+    const token = authHeader && authHeader.split(' ')[1];
+
+    if (!token) return res.status(401).json({ error: 'Access denied' });
+
+    jwt.verify(token, JWT_SECRET, (err, user) => {
+        if (err) return res.status(403).json({ error: 'Invalid token' });
+        req.user = user;
         next();
-    } catch (error) {
-        res.status(401).json({ error: 'Invalid token' });
-    }
+    });
 };
 
-// Auth endpoints
-app.post('/signup', async (req, res) => {
-    try {
-        const { username, password } = req.body;
-        if (users.find(u => u.username === username)) {
-            return res.status(400).json({ error: 'Username already exists' });
-        }
-        users.push({ username, password });
-        res.status(201).json({ message: 'User created successfully' });
-    } catch (error) {
-        res.status(500).json({ error: 'Internal server error' });
-    }
-});
+// Login endpoint
+app.post('/login', (req, res) => {
+    const { username, password } = req.body;
 
-app.post('/login', async (req, res) => {
-    try {
-        const { username, password } = req.body;
-        const user = users.find(u => u.username === username && u.password === password);
-        if (!user) {
-            return res.status(401).json({ error: 'Invalid credentials' });
-        }
-        const token = jwt.sign({ username }, JWT_SECRET, { expiresIn: '1h' });
+    if (username === adminUser.username && password === adminUser.password) {
+        const token = jwt.sign({ username }, JWT_SECRET);
         res.json({ token });
-    } catch (error) {
-        res.status(500).json({ error: 'Internal server error' });
+    } else {
+        res.status(401).json({ error: 'Invalid credentials' });
     }
 });
 
-// Property endpoints
-app.get('/properties', async (req, res) => {
-    try {
-        res.json(properties);
-    } catch (error) {
-        res.status(500).json({ error: 'Internal server error' });
-    }
+// Get all properties
+app.get('/properties', (req, res) => {
+    res.json(properties);
 });
 
-app.get('/properties/:id', async (req, res) => {
-    try {
-        const property = properties.find(p => p.id === req.params.id);
-        if (!property) {
-            return res.status(404).json({ error: 'Property not found' });
-        }
-        res.json(property);
-    } catch (error) {
-        res.status(500).json({ error: 'Internal server error' });
-    }
+// Get property by ID
+app.get('/properties/:id', (req, res) => {
+    const property = properties.find(p => p.id === parseInt(req.params.id));
+    if (!property) return res.status(404).json({ error: 'Property not found' });
+    res.json(property);
 });
 
-app.post('/properties', isAuthenticated, async (req, res) => {
-    try {
-        const { name, price, location, description } = req.body;
-        const newProperty = {
-            id: Date.now().toString(),
-            name,
-            price,
-            location,
-            description,
-            createdBy: req.user.username
-        };
-        properties.push(newProperty);
-        res.status(201).json(newProperty);
-    } catch (error) {
-        res.status(500).json({ error: 'Internal server error' });
-    }
+// Add new property
+app.post('/properties', authenticateToken, (req, res) => {
+    const property = {
+        id: properties.length + 1,
+        ...req.body,
+        createdAt: new Date()
+    };
+    properties.push(property);
+    res.status(201).json(property);
 });
 
-app.put('/properties/:id', isAuthenticated, async (req, res) => {
-    try {
-        const index = properties.findIndex(p => p.id === req.params.id);
-        if (index === -1) {
-            return res.status(404).json({ error: 'Property not found' });
-        }
-        properties[index] = { ...properties[index], ...req.body };
-        res.json(properties[index]);
-    } catch (error) {
-        res.status(500).json({ error: 'Internal server error' });
-    }
+// Update property
+app.put('/properties/:id', authenticateToken, (req, res) => {
+    const index = properties.findIndex(p => p.id === parseInt(req.params.id));
+    if (index === -1) return res.status(404).json({ error: 'Property not found' });
+
+    properties[index] = {
+        ...properties[index],
+        ...req.body,
+        updatedAt: new Date()
+    };
+
+    res.json(properties[index]);
 });
 
-app.delete('/properties/:id', isAuthenticated, async (req, res) => {
-    try {
-        const index = properties.findIndex(p => p.id === req.params.id);
-        if (index === -1) {
-            return res.status(404).json({ error: 'Property not found' });
-        }
-        properties.splice(index, 1);
-        res.status(204).send();
-    } catch (error) {
-        res.status(500).json({ error: 'Internal server error' });
-    }
+// Delete property
+app.delete('/properties/:id', authenticateToken, (req, res) => {
+    const index = properties.findIndex(p => p.id === parseInt(req.params.id));
+    if (index === -1) return res.status(404).json({ error: 'Property not found' });
+
+    properties.splice(index, 1);
+    res.status(204).send();
+});
+
+// Error handling middleware
+app.use((err, req, res, next) => {
+    console.error(err.stack);
+    res.status(500).json({ error: 'Something went wrong!' });
 });
 
 const PORT = process.env.PORT || 3000;
