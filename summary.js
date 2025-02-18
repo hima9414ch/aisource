@@ -1,55 +1,37 @@
 // API Endpoints Summary
 
 /*
+Authentication Endpoints:
+1. POST /signup
+   - Request body: { username: string, password: string }
+   - Response: { message: string } or { error: string }
+
+2. POST /login
+   - Request body: { username: string, password: string }
+   - Response: { token: string } or { error: string }
+
+Property Endpoints:
 1. GET /properties
-   - Description: Retrieves all properties
-   - Request: No parameters required
+   - No request body needed
    - Response: Array of property objects
-   - Response Format: [
-       {
-           id: number,
-           title: string,
-           description: string,
-           price: number,
-           imageUrl: string
-       }
-     ]
 
 2. GET /properties/:id
-   - Description: Retrieves a specific property by ID
-   - Request Parameters: id (number)
-   - Response: Single property object
-   - Response Format: {
-       id: number,
-       title: string,
-       description: string,
-       price: number,
-       imageUrl: string
-     }
+   - URL parameter: id
+   - Response: Property object or { error: string }
 
 3. POST /properties
-   - Description: Creates a new property
-   - Request Body: {
-       title: string (required),
-       description: string (required),
-       price: number (required),
-       imageUrl: string (optional)
-     }
-   - Response: Newly created property object
+   - Headers: Authorization: Bearer <token>
+   - Request body: { name: string, price: number, location: string, description: string }
+   - Response: Created property object or { error: string }
 
 4. PUT /properties/:id
-   - Description: Updates an existing property
-   - Request Parameters: id (number)
-   - Request Body: {
-       title: string (optional),
-       description: string (optional),
-       price: number (optional),
-       imageUrl: string (optional)
-     }
-   - Response: Updated property object
+   - Headers: Authorization: Bearer <token>
+   - URL parameter: id
+   - Request body: Updated property fields
+   - Response: Updated property object or { error: string }
 
 5. DELETE /properties/:id
-   - Description: Deletes a property
-   - Request Parameters: id (number)
-   - Response: No content (204)
+   - Headers: Authorization: Bearer <token>
+   - URL parameter: id
+   - Response: 204 No Content or { error: string }
 */

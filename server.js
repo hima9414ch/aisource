@@ -1,24 +1,62 @@
 const express = require('express');
 const cors = require('cors');
+const jwt = require('jsonwebtoken');
 const app = express();
 
-// Middleware
 app.use(cors());
 app.use(express.json());
 
-// In-memory storage
-let properties = [
-    {
-        id: 1,
-        title: 'Modern Apartment',
-        description: 'Beautiful 2-bedroom apartment',
-        price: 250000,
-        imageUrl: 'https://example.com/apartment.jpg'
-    }
-];
+const JWT_SECRET = 'your-secret-key';
 
-// GET all properties
-app.get('/properties', (req, res) => {
+// In-memory storage
+let properties = [];
+let users = [];
+
+// Middleware for authentication
+const isAuthenticated = (req, res, next) => {
+    try {
+        const token = req.headers.authorization?.split(' ')[1];
+        if (!token) {
+            return res.status(401).json({ error: 'No token provided' });
+        }
+        const decoded = jwt.verify(token, JWT_SECRET);
+        req.user = decoded;
+        next();
+    } catch (error) {
+        res.status(401).json({ error: 'Invalid token' });
+    }
+};
+
+// Auth endpoints
+app.post('/signup', async (req, res) => {
+    try {
+        const { username, password } = req.body;
+        if (users.find(u => u.username === username)) {
+            return res.status(400).json({ error: 'Username already exists' });
+        }
+        users.push({ username, password });
+        res.status(201).json({ message: 'User created successfully' });
+    } catch (error) {
+        res.status(500).json({ error: 'Internal server error' });
+    }
+});
+
+app.post('/login', async (req, res) => {
+    try {
+        const { username, password } = req.body;
+        const user = users.find(u => u.username === username && u.password === password);
+        if (!user) {
+            return res.status(401).json({ error: 'Invalid credentials' });
+        }
+        const token = jwt.sign({ username }, JWT_SECRET, { expiresIn: '1h' });
+        res.json({ token });
+    } catch (error) {
+        res.status(500).json({ error: 'Internal server error' });
+    }
+});
+
+// Property endpoints
+app.get('/properties', async (req, res) => {
     try {
         res.json(properties);
     } catch (error) {
@@ -26,10 +64,9 @@ app.get('/properties', (req, res) => {
     }
 });
 
-// GET property by ID
-app.get('/properties/:id', (req, res) => {
+app.get('/properties/:id', async (req, res) => {
     try {
-        const property = properties.find(p => p.id === parseInt(req.params.id));
+        const property = properties.find(p => p.id === req.params.id);
         if (!property) {
             return res.status(404).json({ error: 'Property not found' });
         }
@@ -39,19 +76,16 @@ app.get('/properties/:id', (req, res) => {
     }
 });
 
-// POST new property
-app.post('/properties', (req, res) => {
+app.post('/properties', isAuthenticated, async (req, res) => {
     try {
-        const { title, description, price, imageUrl } = req.body;
-        if (!title || !description || !price) {
-            return res.status(400).json({ error: 'Missing required fields' });
-        }
+        const { name, price, location, description } = req.body;
         const newProperty = {
-            id: properties.length + 1,
-            title,
-            description,
+            id: Date.now().toString(),
+            name,
             price,
-            imageUrl: imageUrl || ''
+            location,
+            description,
+            createdBy: req.user.username
         };
         properties.push(newProperty);
         res.status(201).json(newProperty);
@@ -60,46 +94,33 @@ app.post('/properties', (req, res) => {
     }
 });
 
-// PUT update property
-app.put('/properties/:id', (req, res) => {
+app.put('/properties/:id', isAuthenticated, async (req, res) => {
     try {
-        const { title, description, price, imageUrl } = req.body;
-        const propertyIndex = properties.findIndex(p => p.id === parseInt(req.params.id));
-        if (propertyIndex === -1) {
+        const index = properties.findIndex(p => p.id === req.params.id);
+        if (index === -1) {
             return res.status(404).json({ error: 'Property not found' });
         }
-        properties[propertyIndex] = {
-            ...properties[propertyIndex],
-            title: title || properties[propertyIndex].title,
-            description: description || properties[propertyIndex].description,
-            price: price || properties[propertyIndex].price,
-            imageUrl: imageUrl || properties[propertyIndex].imageUrl
-        };
-        res.json(properties[propertyIndex]);
+        properties[index] = { ...properties[index], ...req.body };
+        res.json(properties[index]);
     } catch (error) {
         res.status(500).json({ error: 'Internal server error' });
     }
 });
 
-// DELETE property
-app.delete('/properties/:id', (req, res) => {
+app.delete('/properties/:id', isAuthenticated, async (req, res) => {
     try {
-        const propertyIndex = properties.findIndex(p => p.id === parseInt(req.params.id));
-        if (propertyIndex === -1) {
+        const index = properties.findIndex(p => p.id === req.params.id);
+        if (index === -1) {
             return res.status(404).json({ error: 'Property not found' });
         }
-        properties.splice(propertyIndex, 1);
+        properties.splice(index, 1);
         res.status(204).send();
     } catch (error) {
         res.status(500).json({ error: 'Internal server error' });
     }
 });
 
-// Error handling for undefined routes
-app.use((req, res) => {
-    res.status(404).json({ error: 'Route not found' });
-});
-
-app.listen(3000, () => {
-    console.log('Server is running on port 3000');
+const PORT = process.env.PORT || 3000;
+app.listen(PORT, () => {
+    console.log(`Server is running on port ${PORT}`);
 });
