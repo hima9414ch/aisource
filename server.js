@@ -1,96 +1,87 @@
 const express = require('express');
 const cors = require('cors');
-const jwt = require('jsonwebtoken');
+const bodyParser = require('body-parser');
+
 const app = express();
+const port = 3000;
 
+// Middleware
 app.use(cors());
-app.use(express.json());
+app.use(bodyParser.json());
 
-const JWT_SECRET = 'your-secret-key';
-
-// In-memory data storage
-let properties = [];
-let inquiries = [];
-
-// Authentication middleware
-const authenticateToken = (req, res, next) => {
-    const authHeader = req.headers['authorization'];
-    const token = authHeader && authHeader.split(' ')[1];
-
-    if (!token) return res.status(401).json({ error: 'Access denied' });
-
-    try {
-        const verified = jwt.verify(token, JWT_SECRET);
-        req.user = verified;
-        next();
-    } catch (err) {
-        res.status(400).json({ error: 'Invalid token' });
+// In-memory database
+let properties = [
+    {
+        id: 1,
+        title: 'Modern Apartment',
+        description: 'Beautiful 2-bedroom apartment',
+        price: 250000,
+        location: 'Downtown'
     }
-};
+];
 
-// Get all properties
+// GET all properties
 app.get('/properties', (req, res) => {
-    res.json(properties);
+    try {
+        res.json(properties);
+    } catch (error) {
+        res.status(500).json({ error: 'Failed to retrieve properties' });
+    }
 });
 
-// Get single property
-app.get('/properties/:id', (req, res) => {
-    const property = properties.find(p => p.id === parseInt(req.params.id));
-    if (!property) return res.status(404).json({ error: 'Property not found' });
-    res.json(property);
+// POST new property
+app.post('/properties', (req, res) => {
+    try {
+        const newProperty = {
+            id: properties.length + 1,
+            ...req.body
+        };
+        properties.push(newProperty);
+        res.status(201).json(newProperty);
+    } catch (error) {
+        res.status(400).json({ error: 'Failed to add property' });
+    }
 });
 
-// Add new property
-app.post('/properties', authenticateToken, (req, res) => {
-    const property = {
-        id: properties.length + 1,
-        ...req.body,
-        createdAt: new Date()
-    };
-    properties.push(property);
-    res.status(201).json(property);
+// PUT update property
+app.put('/properties/:id', (req, res) => {
+    try {
+        const id = parseInt(req.params.id);
+        const propertyIndex = properties.findIndex(p => p.id === id);
+        
+        if (propertyIndex === -1) {
+            return res.status(404).json({ error: 'Property not found' });
+        }
+
+        properties[propertyIndex] = {
+            ...properties[propertyIndex],
+            ...req.body,
+            id
+        };
+
+        res.json(properties[propertyIndex]);
+    } catch (error) {
+        res.status(400).json({ error: 'Failed to update property' });
+    }
 });
 
-// Update property
-app.put('/properties/:id', authenticateToken, (req, res) => {
-    const index = properties.findIndex(p => p.id === parseInt(req.params.id));
-    if (index === -1) return res.status(404).json({ error: 'Property not found' });
+// DELETE property
+app.delete('/properties/:id', (req, res) => {
+    try {
+        const id = parseInt(req.params.id);
+        const propertyIndex = properties.findIndex(p => p.id === id);
 
-    properties[index] = {
-        ...properties[index],
-        ...req.body,
-        updatedAt: new Date()
-    };
+        if (propertyIndex === -1) {
+            return res.status(404).json({ error: 'Property not found' });
+        }
 
-    res.json(properties[index]);
+        properties = properties.filter(p => p.id !== id);
+        res.status(200).json({ message: 'Property deleted successfully' });
+    } catch (error) {
+        res.status(400).json({ error: 'Failed to delete property' });
+    }
 });
 
-// Delete property
-app.delete('/properties/:id', authenticateToken, (req, res) => {
-    const index = properties.findIndex(p => p.id === parseInt(req.params.id));
-    if (index === -1) return res.status(404).json({ error: 'Property not found' });
-
-    properties.splice(index, 1);
-    res.status(204).send();
-});
-
-// Submit inquiry
-app.post('/inquiries', (req, res) => {
-    const inquiry = {
-        id: inquiries.length + 1,
-        ...req.body,
-        createdAt: new Date()
-    };
-    inquiries.push(inquiry);
-    res.status(201).json(inquiry);
-});
-
-// Error handling middleware
-app.use((err, req, res, next) => {
-    console.error(err.stack);
-    res.status(500).json({ error: 'Something went wrong!' });
-});
-
-app.listen(3000, () => {
-    console.log('Server running on port 3000');
+app.listen(port, () => {
+    console.log(`Server running on port ${port}`);
 });
