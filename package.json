@@ -1,14 +1,14 @@
 {
   "name": "real-estate-backend",
   "version": "1.0.0",
-  "description": "Backend for real estate website",
+  "description": "Real Estate Website Backend",
   "main": "server.js",
+  "scripts": {
+    "start": "node server.js"
+  },
   "dependencies": {
     "express": "^4.17.1",
     "cors": "^2.8.5",
     "jsonwebtoken": "^8.5.1"
-  },
-  "scripts": {
-    "start": "node server.js"
   }
 }

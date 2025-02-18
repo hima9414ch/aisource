@@ -1,31 +1,45 @@
 /**
  * API Endpoints Summary
  *
- * 1. POST /login
- *    - Request: { username: string, password: string }
- *    - Response: { token: string } or { error: string }
- *
- * 2. GET /properties
- *    - Request: No parameters
+ * 1. GET /properties
+ *    - Description: Retrieve all properties with optional filtering
+ *    - Query Parameters:
+ *      - city (optional): Filter by city
+ *      - minPrice (optional): Filter by minimum price
+ *      - maxPrice (optional): Filter by maximum price
  *    - Response: Array of property objects
  *
+ * 2. POST /properties
+ *    - Description: Add a new property
+ *    - Authentication: Required (JWT token in Authorization header)
+ *    - Request Body: Property object with title, description, price, address, contact email
+ *    - Response: Created property object with ID
+ *
  * 3. GET /properties/:id
- *    - Request Parameters: id (number)
- *    - Response: Property object or { error: string }
+ *    - Description: Get specific property by ID
+ *    - Parameters: property ID
+ *    - Response: Property object
  *
- * 4. POST /properties
- *    - Headers: Authorization: Bearer <token>
- *    - Request Body: Property details object
- *    - Response: Created property object
- *
- * 5. PUT /properties/:id
- *    - Headers: Authorization: Bearer <token>
- *    - Request Parameters: id (number)
- *    - Request Body: Updated property details
+ * 4. PUT /properties/:id
+ *    - Description: Update specific property
+ *    - Authentication: Required (JWT token in Authorization header)
+ *    - Parameters: property ID
+ *    - Request Body: Updated property fields
  *    - Response: Updated property object
  *
- * 6. DELETE /properties/:id
- *    - Headers: Authorization: Bearer <token>
- *    - Request Parameters: id (number)
+ * 5. DELETE /properties/:id
+ *    - Description: Delete specific property
+ *    - Authentication: Required (JWT token in Authorization header)
+ *    - Parameters: property ID
  *    - Response: 204 No Content
+ *
+ * 6. POST /users/register
+ *    - Description: Register new user
+ *    - Request Body: { email, password }
+ *    - Response: { token: JWT_TOKEN }
+ *
+ * 7. POST /users/login
+ *    - Description: Authenticate user
+ *    - Request Body: { email, password }
+ *    - Response: { token: JWT_TOKEN }
  */
