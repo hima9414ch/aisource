@@ -1,39 +1,48 @@
-/**
- * Real Estate Backend API Summary
- *
- * Authentication Endpoints:
- * 1. POST /register
- *    - Request: { email: string, password: string }
- *    - Response: { message: string } or { error: string }
- *
- * 2. POST /login
- *    - Request: { email: string, password: string }
- *    - Response: { token: string } or { error: string }
- *
- * Property Endpoints:
- * 1. GET /properties
- *    - Response: Array of property objects
- *    - No authentication required
- *
- * 2. GET /properties/:id
- *    - Response: Single property object or { error: string }
- *    - No authentication required
- *
- * 3. POST /properties
- *    - Request: { title: string, price: number, location: string, propertyType: string, description: string }
- *    - Response: Created property object
- *    - Requires authentication token in header
- *
- * 4. PUT /properties/:id
- *    - Request: { title?: string, price?: number, location?: string, propertyType?: string, description?: string }
- *    - Response: Updated property object
- *    - Requires authentication token in header
- *
- * 5. DELETE /properties/:id
- *    - Response: 204 No Content
- *    - Requires authentication token in header
- *
- * Authentication:
- * - Protected routes require Bearer token in Authorization header
- * - Format: Authorization: Bearer <token>
- */
+/*
+Real Estate Backend API Summary
+
+1. GET /properties
+   - Description: Retrieve all property listings
+   - Request: No parameters required
+   - Response: Array of property objects
+
+2. GET /properties/:id
+   - Description: Retrieve a specific property by ID
+   - Request Parameters: id (number)
+   - Response: Single property object or 404 error
+
+3. POST /properties
+   - Description: Add a new property listing
+   - Authentication: Required (JWT token in Authorization header)
+   - Request Body: {
+       title: string,
+       description: string,
+       price: number,
+       location: string,
+       type: string
+     }
+   - Response: Created property object with ID
+
+4. PUT /properties/:id
+   - Description: Update an existing property
+   - Authentication: Required (JWT token in Authorization header)
+   - Request Parameters: id (number)
+   - Request Body: Same as POST /properties
+   - Response: Updated property object
+
+5. DELETE /properties/:id
+   - Description: Delete a property listing
+   - Authentication: Required (JWT token in Authorization header)
+   - Request Parameters: id (number)
+   - Response: 204 No Content
+
+6. POST /inquiries
+   - Description: Submit a property inquiry
+   - Request Body: {
+       propertyId: number,
+       name: string,
+       email: string,
+       message: string
+     }
+   - Response: Created inquiry object with ID
+*/
