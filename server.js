@@ -1,24 +1,14 @@
 const express = require('express');
 const cors = require('cors');
-const bodyParser = require('body-parser');
-
 const app = express();
-const port = 3000;
 
 // Middleware
 app.use(cors());
-app.use(bodyParser.json());
+app.use(express.json());
 
-// In-memory database
-let properties = [
-    {
-        id: 1,
-        title: 'Modern Apartment',
-        description: 'Beautiful 2-bedroom apartment',
-        price: 250000,
-        location: 'Downtown'
-    }
-];
+// Simulated database
+let properties = [];
+let nextId = 1;
 
 // GET all properties
 app.get('/properties', (req, res) => {
@@ -29,59 +19,88 @@ app.get('/properties', (req, res) => {
     }
 });
 
+// GET single property
+app.get('/properties/:id', (req, res) => {
+    try {
+        const property = properties.find(p => p.id === parseInt(req.params.id));
+        if (!property) {
+            return res.status(404).json({ error: 'Property not found' });
+        }
+        res.json(property);
+    } catch (error) {
+        res.status(500).json({ error: 'Failed to retrieve property' });
+    }
+});
+
 // POST new property
 app.post('/properties', (req, res) => {
     try {
+        const { title, description, price, imageUrl } = req.body;
+        
+        if (!title || !description || !price) {
+            return res.status(400).json({ error: 'Missing required fields' });
+        }
+
         const newProperty = {
-            id: properties.length + 1,
-            ...req.body
+            id: nextId++,
+            title,
+            description,
+            price,
+            imageUrl,
+            createdAt: new Date()
         };
+
         properties.push(newProperty);
         res.status(201).json(newProperty);
     } catch (error) {
-        res.status(400).json({ error: 'Failed to add property' });
+        res.status(500).json({ error: 'Failed to create property' });
     }
 });
 
 // PUT update property
 app.put('/properties/:id', (req, res) => {
     try {
-        const id = parseInt(req.params.id);
-        const propertyIndex = properties.findIndex(p => p.id === id);
+        const propertyIndex = properties.findIndex(p => p.id === parseInt(req.params.id));
         
         if (propertyIndex === -1) {
             return res.status(404).json({ error: 'Property not found' });
         }
 
-        properties[propertyIndex] = {
+        const updatedProperty = {
             ...properties[propertyIndex],
             ...req.body,
-            id
+            id: properties[propertyIndex].id
         };
 
-        res.json(properties[propertyIndex]);
+        properties[propertyIndex] = updatedProperty;
+        res.json(updatedProperty);
     } catch (error) {
-        res.status(400).json({ error: 'Failed to update property' });
+        res.status(500).json({ error: 'Failed to update property' });
     }
 });
 
 // DELETE property
 app.delete('/properties/:id', (req, res) => {
     try {
-        const id = parseInt(req.params.id);
-        const propertyIndex = properties.findIndex(p => p.id === id);
-
+        const propertyIndex = properties.findIndex(p => p.id === parseInt(req.params.id));
+        
         if (propertyIndex === -1) {
             return res.status(404).json({ error: 'Property not found' });
         }
 
-        properties = properties.filter(p => p.id !== id);
-        res.status(200).json({ message: 'Property deleted successfully' });
+        properties.splice(propertyIndex, 1);
+        res.status(204).send();
     } catch (error) {
-        res.status(400).json({ error: 'Failed to delete property' });
+        res.status(500).json({ error: 'Failed to delete property' });
     }
 });
 
-app.listen(port, () => {
-    console.log(`Server running on port ${port}`);
+// Error handling for invalid routes
+app.use((req, res) => {
+    res.status(404).json({ error: 'Route not found' });
+});
+
+const PORT = process.env.PORT || 3000;
+app.listen(PORT, () => {
+    console.log(`Server is running on port ${PORT}`);
 });
