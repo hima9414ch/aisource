@@ -1,58 +1,39 @@
 /**
- * Real Estate API Documentation
+ * Real Estate Backend API Summary
  *
- * Base URL: http://localhost:3000
+ * Authentication Endpoints:
+ * 1. POST /register
+ *    - Request: { email: string, password: string }
+ *    - Response: { message: string } or { error: string }
  *
- * Endpoints:
+ * 2. POST /login
+ *    - Request: { email: string, password: string }
+ *    - Response: { token: string } or { error: string }
  *
- * 1. Create Property
- *    POST /properties
- *    Headers: Authorization: Bearer <token>
- *    Request Body: {
- *      title: string,
- *      description: string,
- *      price: number,
- *      imageUrl: string,
- *      location: string
- *    }
- *    Response: 201 Created
- *      Returns created property object with ID
+ * Property Endpoints:
+ * 1. GET /properties
+ *    - Response: Array of property objects
+ *    - No authentication required
  *
- * 2. Get All Properties
- *    GET /properties
- *    Query Parameters:
- *      - minPrice: number (optional)
- *      - maxPrice: number (optional)
- *      - location: string (optional)
- *    Response: 200 OK
- *      Returns array of property objects
+ * 2. GET /properties/:id
+ *    - Response: Single property object or { error: string }
+ *    - No authentication required
  *
- * 3. Get Single Property
- *    GET /properties/:id
- *    Response: 200 OK
- *      Returns single property object
+ * 3. POST /properties
+ *    - Request: { title: string, price: number, location: string, propertyType: string, description: string }
+ *    - Response: Created property object
+ *    - Requires authentication token in header
  *
- * 4. Update Property
- *    PUT /properties/:id
- *    Headers: Authorization: Bearer <token>
- *    Request Body: {
- *      title: string,
- *      description: string,
- *      price: number,
- *      imageUrl: string,
- *      location: string
- *    }
- *    Response: 200 OK
- *      Returns updated property object
+ * 4. PUT /properties/:id
+ *    - Request: { title?: string, price?: number, location?: string, propertyType?: string, description?: string }
+ *    - Response: Updated property object
+ *    - Requires authentication token in header
  *
- * 5. Delete Property
- *    DELETE /properties/:id
- *    Headers: Authorization: Bearer <token>
- *    Response: 204 No Content
+ * 5. DELETE /properties/:id
+ *    - Response: 204 No Content
+ *    - Requires authentication token in header
  *
- * Error Responses:
- * - 400 Bad Request: Missing required fields
- * - 401 Unauthorized: Missing authentication token
- * - 403 Forbidden: Invalid token
- * - 404 Not Found: Property not found
+ * Authentication:
+ * - Protected routes require Bearer token in Authorization header
+ * - Format: Authorization: Bearer <token>
  */
