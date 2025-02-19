@@ -1,29 +1,39 @@
-// API Endpoints Summary
-
 /*
-1. POST /api/auth/login
-   Request body: { username: string, password: string }
-   Response: { token: string }
+Real Estate API Endpoints Summary
 
-2. GET /api/listings
-   Response: Array of listing objects
-   [{ id: string, title: string, description: string, price: number, imageURL: string }]
+1. Authentication
+   POST /api/auth/login
+   - Request: { username: string, password: string }
+   - Response: { token: string }
 
-3. GET /api/listings/:id
-   Response: Single listing object
-   { id: string, title: string, description: string, price: number, imageURL: string }
+2. Get All Listings
+   GET /api/listings
+   - Response: Array of listing objects
 
-4. POST /api/listings (Protected)
-   Headers: Authorization: Bearer <token>
-   Request body: { title: string, description: string, price: number, imageURL: string }
-   Response: Created listing object
+3. Get Single Listing
+   GET /api/listings/:id
+   - Response: Single listing object
 
-5. PUT /api/listings/:id (Protected)
-   Headers: Authorization: Bearer <token>
-   Request body: { title?: string, description?: string, price?: number, imageURL?: string }
-   Response: Updated listing object
+4. Create Listing (Requires Authentication)
+   POST /api/listings
+   - Headers: Authorization: Bearer <token>
+   - Request: {
+       title: string,
+       description: string,
+       price: number,
+       image: string,
+       agent: string
+     }
+   - Response: Created listing object
 
-6. DELETE /api/listings/:id (Protected)
-   Headers: Authorization: Bearer <token>
-   Response: 204 No Content
+5. Update Listing (Requires Authentication)
+   PUT /api/listings/:id
+   - Headers: Authorization: Bearer <token>
+   - Request: Any listing properties to update
+   - Response: Updated listing object
+
+6. Delete Listing (Requires Authentication)
+   DELETE /api/listings/:id
+   - Headers: Authorization: Bearer <token>
+   - Response: 204 No Content
 */
