@@ -1,33 +1,26 @@
 const express = require('express');
-const cors = require('cors');
 const jwt = require('jsonwebtoken');
+const cors = require('cors');
 const app = express();
 
-// Middleware
 app.use(cors());
 app.use(express.json());
 
-// JWT Secret
 const JWT_SECRET = 'your-secret-key';
+const PORT = process.env.PORT || 3000;
 
-// In-memory database
-let properties = [
-    {
-        id: 1,
-        address: '123 Main St',
-        price: 500000,
-        description: 'Beautiful 3-bedroom house'
-    }
+// In-memory storage
+let listings = [];
+const users = [
+    { username: 'admin', password: 'admin123' }
 ];
 
-// Authentication middleware
+// Middleware for JWT verification
 const authenticateToken = (req, res, next) => {
     const authHeader = req.headers['authorization'];
     const token = authHeader && authHeader.split(' ')[1];
 
-    if (!token) {
-        return res.status(401).json({ error: 'Authentication required' });
-    }
+    if (!token) return res.status(401).json({ error: 'Access denied' });
 
     jwt.verify(token, JWT_SECRET, (err, user) => {
         if (err) return res.status(403).json({ error: 'Invalid token' });
@@ -36,68 +29,54 @@ const authenticateToken = (req, res, next) => {
     });
 };
 
-// GET all properties
-app.get('/properties', (req, res) => {
-    res.json(properties);
+// Auth endpoint
+app.post('/api/auth/login', (req, res) => {
+    const { username, password } = req.body;
+    const user = users.find(u => u.username === username && u.password === password);
+
+    if (!user) return res.status(401).json({ error: 'Invalid credentials' });
+
+    const token = jwt.sign({ username: user.username }, JWT_SECRET);
+    res.json({ token });
 });
 
-// GET property by ID
-app.get('/properties/:id', (req, res) => {
-    const property = properties.find(p => p.id === parseInt(req.params.id));
-    if (!property) {
-        return res.status(404).json({ error: 'Property not found' });
-    }
-    res.json(property);
+// Listings endpoints
+app.get('/api/listings', (req, res) => {
+    res.json(listings);
 });
 
-// POST new property
-app.post('/properties', authenticateToken, (req, res) => {
-    const { address, price, description } = req.body;
+app.get('/api/listings/:id', (req, res) => {
+    const listing = listings.find(l => l.id === req.params.id);
+    if (!listing) return res.status(404).json({ error: 'Listing not found' });
+    res.json(listing);
+});
 
-    if (!address || !price || !description) {
-        return res.status(400).json({ error: 'Missing required fields' });
-    }
-
-    const newProperty = {
-        id: properties.length + 1,
-        address,
+app.post('/api/listings', authenticateToken, (req, res) => {
+    const { title, description, price, imageURL } = req.body;
+    const newListing = {
+        id: Date.now().toString(),
+        title,
+        description,
         price,
-        description
+        imageURL
     };
-
-    properties.push(newProperty);
-    res.status(201).json(newProperty);
+    listings.push(newListing);
+    res.status(201).json(newListing);
 });
 
-// PUT update property
-app.put('/properties/:id', authenticateToken, (req, res) => {
-    const propertyIndex = properties.findIndex(p => p.id === parseInt(req.params.id));
-    
-    if (propertyIndex === -1) {
-        return res.status(404).json({ error: 'Property not found' });
-    }
+app.put('/api/listings/:id', authenticateToken, (req, res) => {
+    const index = listings.findIndex(l => l.id === req.params.id);
+    if (index === -1) return res.status(404).json({ error: 'Listing not found' });
 
-    const { address, price, description } = req.body;
-    
-    properties[propertyIndex] = {
-        ...properties[propertyIndex],
-        address: address || properties[propertyIndex].address,
-        price: price || properties[propertyIndex].price,
-        description: description || properties[propertyIndex].description
-    };
-
-    res.json(properties[propertyIndex]);
+    listings[index] = { ...listings[index], ...req.body };
+    res.json(listings[index]);
 });
 
-// DELETE property
-app.delete('/properties/:id', authenticateToken, (req, res) => {
-    const propertyIndex = properties.findIndex(p => p.id === parseInt(req.params.id));
-    
-    if (propertyIndex === -1) {
-        return res.status(404).json({ error: 'Property not found' });
-    }
+app.delete('/api/listings/:id', authenticateToken, (req, res) => {
+    const index = listings.findIndex(l => l.id === req.params.id);
+    if (index === -1) return res.status(404).json({ error: 'Listing not found' });
 
-    properties.splice(propertyIndex, 1);
+    listings = listings.filter(l => l.id !== req.params.id);
     res.status(204).send();
 });
 
@@ -107,6 +86,6 @@ app.use((err, req, res, next) => {
     res.status(500).json({ error: 'Something went wrong!' });
 });
 
-app.listen(3000, () => {
-    console.log('Server is running on port 3000');
+app.listen(PORT, () => {
+    console.log(`Server running on port ${PORT}`);
 });

@@ -1,40 +1,29 @@
-/**
- * Real Estate API Endpoints Summary
- *
- * 1. GET /properties
- *    - Description: Retrieve all properties
- *    - Parameters: None
- *    - Response: Array of property objects
- *
- * 2. GET /properties/:id
- *    - Description: Retrieve a specific property
- *    - Parameters: id (URL parameter)
- *    - Response: Single property object
- *
- * 3. POST /properties
- *    - Description: Create a new property
- *    - Authentication: Required (JWT token in Authorization header)
- *    - Request Body: {
- *        address: string,
- *        price: number,
- *        description: string
- *      }
- *    - Response: Created property object
- *
- * 4. PUT /properties/:id
- *    - Description: Update an existing property
- *    - Authentication: Required (JWT token in Authorization header)
- *    - Parameters: id (URL parameter)
- *    - Request Body: {
- *        address?: string,
- *        price?: number,
- *        description?: string
- *      }
- *    - Response: Updated property object
- *
- * 5. DELETE /properties/:id
- *    - Description: Delete a property
- *    - Authentication: Required (JWT token in Authorization header)
- *    - Parameters: id (URL parameter)
- *    - Response: 204 No Content
- */
+// API Endpoints Summary
+
+/*
+1. POST /api/auth/login
+   Request body: { username: string, password: string }
+   Response: { token: string }
+
+2. GET /api/listings
+   Response: Array of listing objects
+   [{ id: string, title: string, description: string, price: number, imageURL: string }]
+
+3. GET /api/listings/:id
+   Response: Single listing object
+   { id: string, title: string, description: string, price: number, imageURL: string }
+
+4. POST /api/listings (Protected)
+   Headers: Authorization: Bearer <token>
+   Request body: { title: string, description: string, price: number, imageURL: string }
+   Response: Created listing object
+
+5. PUT /api/listings/:id (Protected)
+   Headers: Authorization: Bearer <token>
+   Request body: { title?: string, description?: string, price?: number, imageURL?: string }
+   Response: Updated listing object
+
+6. DELETE /api/listings/:id (Protected)
+   Headers: Authorization: Bearer <token>
+   Response: 204 No Content
+*/
