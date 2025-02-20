@@ -1,39 +1,46 @@
 /*
-Real Estate API Endpoints Summary
+API Endpoints Summary:
 
-1. Authentication
-   POST /api/auth/login
-   - Request: { username: string, password: string }
-   - Response: { token: string }
+1. GET /properties
+   - Description: Fetch all property listings
+   - Parameters: None
+   - Response: Array of property objects
+   - Status: 200 OK
 
-2. Get All Listings
-   GET /api/listings
-   - Response: Array of listing objects
+2. GET /properties/:id
+   - Description: Fetch a single property by ID
+   - Parameters: id (in URL)
+   - Response: Single property object
+   - Status: 200 OK, 404 Not Found
 
-3. Get Single Listing
-   GET /api/listings/:id
-   - Response: Single listing object
-
-4. Create Listing (Requires Authentication)
-   POST /api/listings
-   - Headers: Authorization: Bearer <token>
-   - Request: {
-       title: string,
-       description: string,
-       price: number,
-       image: string,
-       agent: string
+3. POST /properties
+   - Description: Create a new property listing
+   - Request Body: {
+       title: String (required),
+       address: String (required),
+       price: Number (required),
+       description: String (required),
+       images: Array of Strings (optional),
+       features: Array of Strings (optional)
      }
-   - Response: Created listing object
+   - Response: Created property object
+   - Status: 201 Created, 400 Bad Request
 
-5. Update Listing (Requires Authentication)
-   PUT /api/listings/:id
-   - Headers: Authorization: Bearer <token>
-   - Request: Any listing properties to update
-   - Response: Updated listing object
+4. PUT /properties/:id
+   - Description: Update an existing property
+   - Parameters: id (in URL)
+   - Request Body: Same as POST (all fields optional)
+   - Response: Updated property object
+   - Status: 200 OK, 404 Not Found, 400 Bad Request
 
-6. Delete Listing (Requires Authentication)
-   DELETE /api/listings/:id
-   - Headers: Authorization: Bearer <token>
-   - Response: 204 No Content
+5. DELETE /properties/:id
+   - Description: Delete a property
+   - Parameters: id (in URL)
+   - Response: Success message
+   - Status: 200 OK, 404 Not Found
+
+Error Responses:
+- 400: Bad Request - Invalid input data
+- 404: Not Found - Property doesn't exist
+- 500: Server Error - Internal server error
 */

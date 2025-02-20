@@ -1,94 +1,104 @@
 const express = require('express');
-const jwt = require('jsonwebtoken');
+const mongoose = require('mongoose');
 const cors = require('cors');
+require('dotenv').config();
+
 const app = express();
 
 app.use(cors());
 app.use(express.json());
 
-const SECRET_KEY = 'your-secret-key';
+mongoose.connect(process.env.MONGODB_URI)
+  .then(() => console.log('Connected to MongoDB'))
+  .catch(err => console.error('MongoDB connection error:', err));
 
-// In-memory database
-let listings = [];
+// Property Schema
+const propertySchema = new mongoose.Schema({
+  title: { type: String, required: true },
+  address: { type: String, required: true },
+  price: { type: Number, required: true },
+  description: { type: String, required: true },
+  images: [String],
+  features: [String],
+  createdAt: { type: Date, default: Date.now }
+});
 
-// Authentication middleware
-const authenticateToken = (req, res, next) => {
-    const authHeader = req.headers['authorization'];
-    const token = authHeader && authHeader.split(' ')[1];
+const Property = mongoose.model('Property', propertySchema);
 
-    if (!token) return res.status(401).json({ error: 'Access denied' });
+// Get all properties
+app.get('/properties', async (req, res) => {
+  try {
+    const properties = await Property.find();
+    res.json(properties);
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+});
 
-    jwt.verify(token, SECRET_KEY, (err, user) => {
-        if (err) return res.status(403).json({ error: 'Invalid token' });
-        req.user = user;
-        next();
-    });
-};
-
-// Auth endpoint
-app.post('/api/auth/login', (req, res) => {
-    const { username, password } = req.body;
-    
-    // Mock authentication
-    if (username === 'admin' && password === 'password') {
-        const token = jwt.sign({ username }, SECRET_KEY);
-        res.json({ token });
-    } else {
-        res.status(401).json({ error: 'Invalid credentials' });
+// Get single property
+app.get('/properties/:id', async (req, res) => {
+  try {
+    const property = await Property.findById(req.params.id);
+    if (!property) {
+      return res.status(404).json({ message: 'Property not found' });
     }
+    res.json(property);
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
 });
 
-// Get all listings
-app.get('/api/listings', (req, res) => {
-    res.json(listings);
+// Create property
+app.post('/properties', async (req, res) => {
+  const property = new Property({
+    title: req.body.title,
+    address: req.body.address,
+    price: req.body.price,
+    description: req.body.description,
+    images: req.body.images,
+    features: req.body.features
+  });
+
+  try {
+    const newProperty = await property.save();
+    res.status(201).json(newProperty);
+  } catch (error) {
+    res.status(400).json({ message: error.message });
+  }
 });
 
-// Get single listing
-app.get('/api/listings/:id', (req, res) => {
-    const listing = listings.find(l => l.id === req.params.id);
-    if (!listing) return res.status(404).json({ error: 'Listing not found' });
-    res.json(listing);
+// Update property
+app.put('/properties/:id', async (req, res) => {
+  try {
+    const property = await Property.findById(req.params.id);
+    if (!property) {
+      return res.status(404).json({ message: 'Property not found' });
+    }
+
+    Object.assign(property, req.body);
+    const updatedProperty = await property.save();
+    res.json(updatedProperty);
+  } catch (error) {
+    res.status(400).json({ message: error.message });
+  }
 });
 
-// Create new listing
-app.post('/api/listings', authenticateToken, (req, res) => {
-    const { title, description, price, image, agent } = req.body;
-    const newListing = {
-        id: Date.now().toString(),
-        title,
-        description,
-        price,
-        image,
-        agent
-    };
-    listings.push(newListing);
-    res.status(201).json(newListing);
-});
+// Delete property
+app.delete('/properties/:id', async (req, res) => {
+  try {
+    const property = await Property.findById(req.params.id);
+    if (!property) {
+      return res.status(404).json({ message: 'Property not found' });
+    }
 
-// Update listing
-app.put('/api/listings/:id', authenticateToken, (req, res) => {
-    const index = listings.findIndex(l => l.id === req.params.id);
-    if (index === -1) return res.status(404).json({ error: 'Listing not found' });
-
-    listings[index] = { ...listings[index], ...req.body };
-    res.json(listings[index]);
-});
-
-// Delete listing
-app.delete('/api/listings/:id', authenticateToken, (req, res) => {
-    const index = listings.findIndex(l => l.id === req.params.id);
-    if (index === -1) return res.status(404).json({ error: 'Listing not found' });
-
-    listings.splice(index, 1);
-    res.status(204).send();
-});
-
-app.use((err, req, res, next) => {
-    console.error(err.stack);
-    res.status(500).json({ error: 'Something went wrong!' });
+    await property.remove();
+    res.json({ message: 'Property deleted' });
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
 });
 
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
-    console.log(`Server running on port ${PORT}`);
+  console.log(`Server is running on port ${PORT}`);
 });
