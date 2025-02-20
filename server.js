@@ -1,35 +1,34 @@
 const express = require('express');
 const mongoose = require('mongoose');
 const cors = require('cors');
+const dotenv = require('dotenv');
 const jwt = require('jsonwebtoken');
-require('dotenv').config();
+
+dotenv.config();
 
 const app = express();
 
 app.use(cors());
 app.use(express.json());
 
-mongoose.connect(process.env.MONGODB_URI,{ useNewURLParser: true })
+mongoose.connect(process.env.MONGODB_URI)
   .then(() => console.log('Connected to MongoDB'))
   .catch(err => console.error('MongoDB connection error:', err));
 
-// Property Schema
-const propertySchema = new mongoose.Schema({
+// Blog Post Schema
+const postSchema = new mongoose.Schema({
   title: { type: String, required: true },
-  location: { type: String, required: true },
-  price: { type: Number, required: true },
-  description: { type: String, required: true },
-  imageURL: { type: String, required: true },
+  content: { type: String, required: true },
+  author: { type: String, required: true },
   createdAt: { type: Date, default: Date.now }
 });
 
-const Property = mongoose.model('Property', propertySchema);
+const Post = mongoose.model('Post', postSchema);
 
-// User Schema
+// User Schema for Authentication
 const userSchema = new mongoose.Schema({
-  email: { type: String, required: true, unique: true },
-  password: { type: String, required: true },
-  role: { type: String, enum: ['admin', 'user'], default: 'user' }
+  username: { type: String, required: true, unique: true },
+  password: { type: String, required: true }
 });
 
 const User = mongoose.model('User', userSchema);
@@ -41,92 +40,87 @@ const authenticateToken = (req, res, next) => {
 
   if (!token) return res.status(401).json({ error: 'Access denied' });
 
-  jwt.verify(token, process.env.JWT_SECRET, (err, user) => {
+  jwt.verify(token, 'your_jwt_secret', (err, user) => {
     if (err) return res.status(403).json({ error: 'Invalid token' });
     req.user = user;
     next();
   });
 };
 
-// Auth Routes
-app.post('/auth/register', async (req, res) => {
+// Login Route
+app.post('/api/login', async (req, res) => {
   try {
-    const { email, password } = req.body;
-    const user = new User({ email, password });
-    await user.save();
-    res.status(201).json({ message: 'User registered successfully' });
-  } catch (error) {
-    res.status(500).json({ error: error.message });
-  }
-});
-
-app.post('/auth/login', async (req, res) => {
-  try {
-    const { email, password } = req.body;
-    const user = await User.findOne({ email });
+    const { username, password } = req.body;
+    const user = await User.findOne({ username, password });
     
-    if (!user || user.password !== password) {
+    if (!user) {
       return res.status(401).json({ error: 'Invalid credentials' });
     }
 
-    const token = jwt.sign({ userId: user._id }, process.env.JWT_SECRET);
+    const token = jwt.sign({ username: user.username }, 'your_jwt_secret');
     res.json({ token });
   } catch (error) {
-    res.status(500).json({ error: error.message });
+    res.status(500).json({ error: 'Server error' });
   }
 });
 
-// Property Routes
-app.get('/properties', async (req, res) => {
+// Get all posts
+app.get('/api/posts', async (req, res) => {
   try {
-    const properties = await Property.find();
-    res.json(properties);
+    const posts = await Post.find().sort({ createdAt: -1 });
+    res.json(posts);
   } catch (error) {
-    res.status(500).json({ error: error.message });
+    res.status(500).json({ error: 'Server error' });
   }
 });
 
-app.get('/properties/:id', async (req, res) => {
+// Get single post
+app.get('/api/posts/:id', async (req, res) => {
   try {
-    const property = await Property.findById(req.params.id);
-    if (!property) return res.status(404).json({ error: 'Property not found' });
-    res.json(property);
+    const post = await Post.findById(req.params.id);
+    if (!post) return res.status(404).json({ error: 'Post not found' });
+    res.json(post);
   } catch (error) {
-    res.status(500).json({ error: error.message });
+    res.status(500).json({ error: 'Server error' });
   }
 });
 
-app.post('/properties', authenticateToken, async (req, res) => {
+// Create post
+app.post('/api/posts', authenticateToken, async (req, res) => {
   try {
-    const property = new Property(req.body);
-    await property.save();
-    res.status(201).json(property);
+    const { title, content, author } = req.body;
+    const post = new Post({ title, content, author });
+    await post.save();
+    res.status(201).json(post);
   } catch (error) {
-    res.status(400).json({ error: error.message });
+    res.status(500).json({ error: 'Server error' });
   }
 });
 
-app.put('/properties/:id', authenticateToken, async (req, res) => {
+// Update post
+app.put('/api/posts/:id', authenticateToken, async (req, res) => {
   try {
-    const property = await Property.findByIdAndUpdate(
+    const { title, content, author } = req.body;
+    const post = await Post.findByIdAndUpdate(
       req.params.id,
-      req.body,
+      { title, content, author },
       { new: true }
     );
-    if (!property) return res.status(404).json({ error: 'Property not found' });
-    res.json(property);
+    if (!post) return res.status(404).json({ error: 'Post not found' });
+    res.json(post);
   } catch (error) {
-    res.status(400).json({ error: error.message });
+    res.status(500).json({ error: 'Server error' });
   }
 });
 
-app.delete('/properties/:id', authenticateToken, async (req, res) => {
+// Delete post
+app.delete('/api/posts/:id', authenticateToken, async (req, res) => {
   try {
-    const property = await Property.findByIdAndDelete(req.params.id);
-    if (!property) return res.status(404).json({ error: 'Property not found' });
-    res.json({ message: 'Property deleted successfully' });
+    const post = await Post.findByIdAndDelete(req.params.id);
+    if (!post) return res.status(404).json({ error: 'Post not found' });
+    res.json({ message: 'Post deleted successfully' });
   } catch (error) {
-    res.status(500).json({ error: error.message });
+    res.status(500).json({ error: 'Server error' });
   }
 });
 

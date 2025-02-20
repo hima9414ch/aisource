@@ -1,43 +1,31 @@
-// API Endpoints Summary
-
 /*
-1. Authentication Endpoints:
+API Endpoints Summary:
 
-POST /auth/register
-- Request body: { email: string, password: string }
-- Response: { message: string } or { error: string }
+1. POST /api/login
+   Request body: { username: string, password: string }
+   Response: { token: string }
 
-POST /auth/login
-- Request body: { email: string, password: string }
-- Response: { token: string } or { error: string }
+2. GET /api/posts
+   Response: Array of posts
+   [{ _id: string, title: string, content: string, author: string, createdAt: date }]
 
-2. Property Endpoints:
+3. GET /api/posts/:id
+   Parameters: id (post ID)
+   Response: { _id: string, title: string, content: string, author: string, createdAt: date }
 
-GET /properties
-- Description: Retrieve all properties
-- Response: Array of property objects or { error: string }
+4. POST /api/posts
+   Headers: Authorization: Bearer <token>
+   Request body: { title: string, content: string, author: string }
+   Response: Created post object
 
-GET /properties/:id
-- Description: Retrieve a single property by ID
-- Response: Property object or { error: string }
+5. PUT /api/posts/:id
+   Headers: Authorization: Bearer <token>
+   Parameters: id (post ID)
+   Request body: { title: string, content: string, author: string }
+   Response: Updated post object
 
-POST /properties (Requires Authentication)
-- Headers: Authorization: Bearer <token>
-- Request body: {
-    title: string,
-    location: string,
-    price: number,
-    description: string,
-    imageURL: string
-  }
-- Response: Created property object or { error: string }
-
-PUT /properties/:id (Requires Authentication)
-- Headers: Authorization: Bearer <token>
-- Request body: Same as POST, all fields optional
-- Response: Updated property object or { error: string }
-
-DELETE /properties/:id (Requires Authentication)
-- Headers: Authorization: Bearer <token>
-- Response: { message: string } or { error: string }
+6. DELETE /api/posts/:id
+   Headers: Authorization: Bearer <token>
+   Parameters: id (post ID)
+   Response: { message: 'Post deleted successfully' }
 */
