@@ -1,46 +1,43 @@
+// API Endpoints Summary
+
 /*
-API Endpoints Summary:
+1. Authentication Endpoints:
 
-1. GET /properties
-   - Description: Fetch all property listings
-   - Parameters: None
-   - Response: Array of property objects
-   - Status: 200 OK
+POST /auth/register
+- Request body: { email: string, password: string }
+- Response: { message: string } or { error: string }
 
-2. GET /properties/:id
-   - Description: Fetch a single property by ID
-   - Parameters: id (in URL)
-   - Response: Single property object
-   - Status: 200 OK, 404 Not Found
+POST /auth/login
+- Request body: { email: string, password: string }
+- Response: { token: string } or { error: string }
 
-3. POST /properties
-   - Description: Create a new property listing
-   - Request Body: {
-       title: String (required),
-       address: String (required),
-       price: Number (required),
-       description: String (required),
-       images: Array of Strings (optional),
-       features: Array of Strings (optional)
-     }
-   - Response: Created property object
-   - Status: 201 Created, 400 Bad Request
+2. Property Endpoints:
 
-4. PUT /properties/:id
-   - Description: Update an existing property
-   - Parameters: id (in URL)
-   - Request Body: Same as POST (all fields optional)
-   - Response: Updated property object
-   - Status: 200 OK, 404 Not Found, 400 Bad Request
+GET /properties
+- Description: Retrieve all properties
+- Response: Array of property objects or { error: string }
 
-5. DELETE /properties/:id
-   - Description: Delete a property
-   - Parameters: id (in URL)
-   - Response: Success message
-   - Status: 200 OK, 404 Not Found
+GET /properties/:id
+- Description: Retrieve a single property by ID
+- Response: Property object or { error: string }
 
-Error Responses:
-- 400: Bad Request - Invalid input data
-- 404: Not Found - Property doesn't exist
-- 500: Server Error - Internal server error
+POST /properties (Requires Authentication)
+- Headers: Authorization: Bearer <token>
+- Request body: {
+    title: string,
+    location: string,
+    price: number,
+    description: string,
+    imageURL: string
+  }
+- Response: Created property object or { error: string }
+
+PUT /properties/:id (Requires Authentication)
+- Headers: Authorization: Bearer <token>
+- Request body: Same as POST, all fields optional
+- Response: Updated property object or { error: string }
+
+DELETE /properties/:id (Requires Authentication)
+- Headers: Authorization: Bearer <token>
+- Response: { message: string } or { error: string }
 */

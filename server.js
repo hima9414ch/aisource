@@ -1,6 +1,7 @@
 const express = require('express');
 const mongoose = require('mongoose');
 const cors = require('cors');
+const jwt = require('jsonwebtoken');
 require('dotenv').config();
 
 const app = express();
@@ -15,90 +16,121 @@ mongoose.connect(process.env.MONGODB_URI)
 // Property Schema
 const propertySchema = new mongoose.Schema({
   title: { type: String, required: true },
-  address: { type: String, required: true },
+  location: { type: String, required: true },
   price: { type: Number, required: true },
   description: { type: String, required: true },
-  images: [String],
-  features: [String],
+  imageURL: { type: String, required: true },
   createdAt: { type: Date, default: Date.now }
 });
 
 const Property = mongoose.model('Property', propertySchema);
 
-// Get all properties
+// User Schema
+const userSchema = new mongoose.Schema({
+  email: { type: String, required: true, unique: true },
+  password: { type: String, required: true },
+  role: { type: String, enum: ['admin', 'user'], default: 'user' }
+});
+
+const User = mongoose.model('User', userSchema);
+
+// Authentication Middleware
+const authenticateToken = (req, res, next) => {
+  const authHeader = req.headers['authorization'];
+  const token = authHeader && authHeader.split(' ')[1];
+
+  if (!token) return res.status(401).json({ error: 'Access denied' });
+
+  jwt.verify(token, process.env.JWT_SECRET, (err, user) => {
+    if (err) return res.status(403).json({ error: 'Invalid token' });
+    req.user = user;
+    next();
+  });
+};
+
+// Auth Routes
+app.post('/auth/register', async (req, res) => {
+  try {
+    const { email, password } = req.body;
+    const user = new User({ email, password });
+    await user.save();
+    res.status(201).json({ message: 'User registered successfully' });
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
+app.post('/auth/login', async (req, res) => {
+  try {
+    const { email, password } = req.body;
+    const user = await User.findOne({ email });
+    
+    if (!user || user.password !== password) {
+      return res.status(401).json({ error: 'Invalid credentials' });
+    }
+
+    const token = jwt.sign({ userId: user._id }, process.env.JWT_SECRET);
+    res.json({ token });
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
+// Property Routes
 app.get('/properties', async (req, res) => {
   try {
     const properties = await Property.find();
     res.json(properties);
   } catch (error) {
-    res.status(500).json({ message: error.message });
+    res.status(500).json({ error: error.message });
   }
 });
 
-// Get single property
 app.get('/properties/:id', async (req, res) => {
   try {
     const property = await Property.findById(req.params.id);
-    if (!property) {
-      return res.status(404).json({ message: 'Property not found' });
-    }
+    if (!property) return res.status(404).json({ error: 'Property not found' });
     res.json(property);
   } catch (error) {
-    res.status(500).json({ message: error.message });
+    res.status(500).json({ error: error.message });
   }
 });
 
-// Create property
-app.post('/properties', async (req, res) => {
-  const property = new Property({
-    title: req.body.title,
-    address: req.body.address,
-    price: req.body.price,
-    description: req.body.description,
-    images: req.body.images,
-    features: req.body.features
-  });
-
+app.post('/properties', authenticateToken, async (req, res) => {
   try {
-    const newProperty = await property.save();
-    res.status(201).json(newProperty);
+    const property = new Property(req.body);
+    await property.save();
+    res.status(201).json(property);
   } catch (error) {
-    res.status(400).json({ message: error.message });
+    res.status(400).json({ error: error.message });
   }
 });
 
-// Update property
-app.put('/properties/:id', async (req, res) => {
+app.put('/properties/:id', authenticateToken, async (req, res) => {
   try {
-    const property = await Property.findById(req.params.id);
-    if (!property) {
-      return res.status(404).json({ message: 'Property not found' });
-    }
-
-    Object.assign(property, req.body);
-    const updatedProperty = await property.save();
-    res.json(updatedProperty);
+    const property = await Property.findByIdAndUpdate(
+      req.params.id,
+      req.body,
+      { new: true }
+    );
+    if (!property) return res.status(404).json({ error: 'Property not found' });
+    res.json(property);
   } catch (error) {
-    res.status(400).json({ message: error.message });
+    res.status(400).json({ error: error.message });
   }
 });
 
-// Delete property
-app.delete('/properties/:id', async (req, res) => {
+app.delete('/properties/:id', authenticateToken, async (req, res) => {
   try {
-    const property = await Property.findById(req.params.id);
-    if (!property) {
-      return res.status(404).json({ message: 'Property not found' });
-    }
-
-    await property.remove();
-    res.json({ message: 'Property deleted' });
+    const property = await Property.findByIdAndDelete(req.params.id);
+    if (!property) return res.status(404).json({ error: 'Property not found' });
+    res.json({ message: 'Property deleted successfully' });
   } catch (error) {
-    res.status(500).json({ message: error.message });
+    res.status(500).json({ error: error.message });
   }
 });
 
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
-  console.log(`Server is running on port ${PORT}`);
+  console.log(`Server running on port ${PORT}`);
 });
