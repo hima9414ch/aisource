@@ -1,31 +1,32 @@
-// API Endpoints Summary
-
 /*
-1. POST /register
-   Request body: { username: string, password: string, email: string }
-   Response: { message: string } or { error: string }
+API Endpoints Summary:
 
-2. POST /login
-   Request body: { username: string, password: string }
-   Response: { token: string } or { error: string }
+1. Authentication Endpoints:
+   POST /auth/register
+   - Request: { username: string, email: string, password: string }
+   - Response: { message: string }
 
-3. POST /posts
-   Headers: Authorization: Bearer <token>
-   Request body: { title: string, content: string }
-   Response: Created post object or { error: string }
+   POST /auth/login
+   - Request: { email: string, password: string }
+   - Response: { token: string }
 
-4. GET /posts
-   Response: Array of post objects or { error: string }
+2. Blog Post Endpoints:
+   GET /posts
+   - Response: Array of blog posts
 
-5. GET /posts/:id
-   Response: Single post object or { error: string }
+   GET /posts/:id
+   - Response: Single blog post object
 
-6. PUT /posts/:id
-   Headers: Authorization: Bearer <token>
-   Request body: { title?: string, content?: string }
-   Response: Updated post object or { error: string }
+   POST /posts (requires authentication)
+   - Request: { title: string, content: string }
+   - Response: Created post object
 
-7. DELETE /posts/:id
-   Headers: Authorization: Bearer <token>
-   Response: { message: string } or { error: string }
+   PUT /posts/:id (requires authentication)
+   - Request: { title?: string, content?: string }
+   - Response: Updated post object
+
+   DELETE /posts/:id (requires authentication)
+   - Response: { message: string }
+
+All authenticated routes require Bearer token in Authorization header
 */
