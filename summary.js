@@ -1,17 +1,5 @@
 /**
- * API Endpoints Summary:
-
- Auth Routes
- 1. /register
- - username
- -email
- -password
-
- 2. Login 
- /login 
- -email
- -password
- 
+ * API Endpoints Summary: 
  *
  * 1. GET /api/listings
  *    - Description: Retrieve all real estate listings
