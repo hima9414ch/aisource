@@ -1,31 +1,36 @@
 /*
 API Endpoints Summary:
 
-1. POST /api/login
-   Request body: { username: string, password: string }
-   Response: { token: string }
+Authentication Endpoints:
+1. POST /api/auth/register
+   - Request: { username: string, email: string, password: string }
+   - Response: { token: string }
 
-2. GET /api/posts
-   Response: Array of posts
-   [{ _id: string, title: string, content: string, author: string, createdAt: date }]
+2. POST /api/auth/login
+   - Request: { email: string, password: string }
+   - Response: { token: string }
 
-3. GET /api/posts/:id
-   Parameters: id (post ID)
-   Response: { _id: string, title: string, content: string, author: string, createdAt: date }
+Blog Post Endpoints:
+1. GET /api/posts
+   - Response: Array of all posts with author details
 
-4. POST /api/posts
-   Headers: Authorization: Bearer <token>
-   Request body: { title: string, content: string, author: string }
-   Response: Created post object
+2. GET /api/posts/:id
+   - Response: Single post object with author details
 
-5. PUT /api/posts/:id
-   Headers: Authorization: Bearer <token>
-   Parameters: id (post ID)
-   Request body: { title: string, content: string, author: string }
-   Response: Updated post object
+3. POST /api/posts
+   - Headers: x-auth-token: string
+   - Request: { title: string, content: string }
+   - Response: Created post object
 
-6. DELETE /api/posts/:id
-   Headers: Authorization: Bearer <token>
-   Parameters: id (post ID)
-   Response: { message: 'Post deleted successfully' }
+4. PUT /api/posts/:id
+   - Headers: x-auth-token: string
+   - Request: { title?: string, content?: string }
+   - Response: Updated post object
+
+5. DELETE /api/posts/:id
+   - Headers: x-auth-token: string
+   - Response: { message: 'Post deleted' }
+
+All endpoints return error responses in format:
+{ message: string }
 */
