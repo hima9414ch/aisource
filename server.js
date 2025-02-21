@@ -1,10 +1,7 @@
 const express = require('express');
-const mongoose = require('mongoose');
 const cors = require('cors');
+const mongoose = require('mongoose');
 require('dotenv').config();
-
-const authRoutes = require('./authRoutes');
-const postRoutes = require('./postRoutes');
 
 const app = express();
 
@@ -15,12 +12,12 @@ mongoose.connect(process.env.MONGODB_URI)
   .then(() => console.log('Connected to MongoDB'))
   .catch(err => console.error('MongoDB connection error:', err));
 
-app.use('/auth', authRoutes);
-app.use('/posts', postRoutes);
+const listingRoutes = require('./routes');
+app.use('/api', listingRoutes);
 
 app.use((err, req, res, next) => {
   console.error(err.stack);
-  res.status(500).json({ message: 'Something went wrong!' });
+  res.status(500).json({ error: 'Something went wrong!' });
 });
 
 const PORT = process.env.PORT || 3000;
