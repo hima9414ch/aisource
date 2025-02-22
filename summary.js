@@ -1,38 +1,29 @@
-/**
- * API Endpoints Summary: 
- *
- * 1. GET /api/listings
- *    - Description: Retrieve all real estate listings
- *    - Parameters: None
- *    - Response: Array of listing objects
- *
- * 2. GET /api/listings/:id
- *    - Description: Retrieve a specific listing by ID
- *    - Parameters: id (in URL)
- *    - Response: Single listing object or 404 error
- *
- * 3. POST /api/listings
- *    - Description: Create a new listing
- *    - Request Body: {
- *        title: String (required),
- *        address: String (required),
- *        price: Number (required),
- *        bedrooms: Number (required),
- *        bathrooms: Number (required),
- *        squareFootage: Number (required),
- *        description: String (optional),
- *        images: Array of Strings (optional)
- *      }
- *    - Response: Created listing object
- *
- * 4. PUT /api/listings/:id
- *    - Description: Update an existing listing
- *    - Parameters: id (in URL)
- *    - Request Body: Same as POST (all fields optional)
- *    - Response: Updated listing object
- *
- * 5. DELETE /api/listings/:id
- *    - Description: Delete a listing
- *    - Parameters: id (in URL)
- *    - Response: Success message
- */
+/*
+API Endpoints Summary:
+
+1. Authentication Endpoints:
+   - POST /api/register
+     Request body: { email: string, password: string, name: string }
+     Response: { token: string }
+
+   - POST /api/login
+     Request body: { email: string, password: string }
+     Response: { token: string }
+
+2. Property Endpoints:
+   - GET /api/properties/list
+     Query parameters: type, location, minPrice, maxPrice
+     Response: Array of property objects
+
+   - GET /api/properties/detail/:id
+     URL parameters: id (property ID)
+     Response: Single property object
+
+3. Contact Endpoint:
+   - POST /api/contact/send
+     Request body: { name: string, email: string, message: string }
+     Response: { message: string }
+
+All error responses follow the format:
+{ message: string }
+*/
