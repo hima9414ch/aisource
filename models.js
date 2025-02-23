@@ -1,16 +1,25 @@
 const mongoose = require('mongoose');
 
-const listingSchema = new mongoose.Schema({
+const propertySchema = new mongoose.Schema({
   title: { type: String, required: true },
-  address: { type: String, required: true },
   price: { type: Number, required: true },
-  bedrooms: { type: Number, required: true },
-  bathrooms: { type: Number, required: true },
-  squareFootage: { type: Number, required: true },
+  address: { type: String, required: true },
   description: String,
-  images: [String],
+  bedrooms: Number,
+  bathrooms: Number,
+  area: Number,
+  imageUrls: [String],
   createdAt: { type: Date, default: Date.now },
   updatedAt: { type: Date, default: Date.now }
 });
 
-module.exports = mongoose.model('Listing', listingSchema);
+const userSchema = new mongoose.Schema({
+  username: { type: String, required: true, unique: true },
+  password: { type: String, required: true },
+  createdAt: { type: Date, default: Date.now }
+});
+
+const Property = mongoose.model('Property', propertySchema);
+const User = mongoose.model('User', userSchema);
+
+module.exports = { Property, User };

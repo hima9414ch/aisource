@@ -1,12 +1,13 @@
+/*
 API Endpoints Summary:
 
 1. Authentication Endpoints:
    - POST /register
-     Request body: { email: string, password: string }
+     Request body: { username: string, password: string }
      Response: { message: string } or { error: string }
 
    - POST /login
-     Request body: { email: string, password: string }
+     Request body: { username: string, password: string }
      Response: { token: string } or { error: string }
 
 2. Property Endpoints:
@@ -15,21 +16,40 @@ API Endpoints Summary:
      No authentication required
 
    - GET /properties/:id
-     Response: Single property object
+     Response: Single property object or 404 error
      No authentication required
 
    - POST /properties
-     Request headers: Authorization: Bearer {token}
-     Request body: { title: string, description: string, price: number, imageUrl: string, location: string }
+     Request body: {
+       title: string,
+       price: number,
+       address: string,
+       description?: string,
+       bedrooms?: number,
+       bathrooms?: number,
+       area?: number,
+       imageUrls?: string[]
+     }
      Response: Created property object
+     Requires authentication
 
    - PUT /properties/:id
-     Request headers: Authorization: Bearer {token}
-     Request body: { title?: string, description?: string, price?: number, imageUrl?: string, location?: string }
+     Request body: Same as POST /properties
      Response: Updated property object
+     Requires authentication
 
    - DELETE /properties/:id
-     Request headers: Authorization: Bearer {token}
      Response: { message: string }
+     Requires authentication
 
-All endpoints return appropriate error messages with proper status codes when something goes wrong.
+Authentication:
+- Protected routes require a JWT token in the Authorization header
+- Format: 'Bearer <token>'
+
+Error Responses:
+- 400: Bad Request
+- 401: Unauthorized
+- 403: Forbidden
+- 404: Not Found
+- 500: Internal Server Error
+*/
