@@ -1,55 +1,37 @@
 /*
 API Endpoints Summary:
 
-1. Authentication Endpoints:
-   - POST /register
-     Request body: { username: string, password: string }
-     Response: { message: string } or { error: string }
+User Authentication:
+1. POST /api/register
+   - Request: { email: string, password: string, name: string }
+   - Response: { token: string }
 
-   - POST /login
-     Request body: { username: string, password: string }
-     Response: { token: string } or { error: string }
+2. POST /api/login
+   - Request: { email: string, password: string }
+   - Response: { token: string }
 
-2. Property Endpoints:
-   - GET /properties
-     Response: Array of property objects
-     No authentication required
+Property Management:
+1. GET /api/properties
+   - Description: Fetch all properties
+   - Response: Array of property objects
 
-   - GET /properties/:id
-     Response: Single property object or 404 error
-     No authentication required
+2. POST /api/properties/new
+   - Auth Required: Yes
+   - Request: { title: string, description: string, price: number, location: string }
+   - Response: Created property object
 
-   - POST /properties
-     Request body: {
-       title: string,
-       price: number,
-       address: string,
-       description?: string,
-       bedrooms?: number,
-       bathrooms?: number,
-       area?: number,
-       imageUrls?: string[]
-     }
-     Response: Created property object
-     Requires authentication
+3. GET /api/properties/:id
+   - Description: Fetch single property details
+   - Response: Property object
 
-   - PUT /properties/:id
-     Request body: Same as POST /properties
-     Response: Updated property object
-     Requires authentication
+4. PUT /api/properties/:id
+   - Auth Required: Yes
+   - Request: { title?: string, description?: string, price?: number, location?: string }
+   - Response: Updated property object
 
-   - DELETE /properties/:id
-     Response: { message: string }
-     Requires authentication
+5. DELETE /api/properties/:id
+   - Auth Required: Yes
+   - Response: { message: string }
 
-Authentication:
-- Protected routes require a JWT token in the Authorization header
-- Format: 'Bearer <token>'
-
-Error Responses:
-- 400: Bad Request
-- 401: Unauthorized
-- 403: Forbidden
-- 404: Not Found
-- 500: Internal Server Error
+Note: All authenticated routes require Bearer token in Authorization header
 */
