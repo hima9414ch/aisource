@@ -1,14 +1,12 @@
 const express = require('express');
 const router = express.Router();
+const Contact = require('./contactModel');
 
-router.post('/contact/send', async (req, res) => {
+router.post('/submit', async (req, res) => {
     try {
-        const { name, email, message } = req.body;
-        
-        // Here you would typically integrate with an email service
-        // For demonstration, we'll just send a success response
-        
-        res.json({ message: 'Message sent successfully' });
+        const contact = new Contact(req.body);
+        await contact.save();
+        res.status(201).json({ message: 'Contact form submitted successfully' });
     } catch (error) {
         res.status(500).json({ message: 'Server error' });
     }

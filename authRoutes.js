@@ -3,44 +3,48 @@ const router = express.Router();
 const jwt = require('jsonwebtoken');
 const bcrypt = require('bcryptjs');
 const User = require('./userModel');
+const auth = require('./middleware/auth');
 
 router.post('/register', async (req, res) => {
     try {
         const { email, password, name } = req.body;
-        
         const existingUser = await User.findOne({ email });
-        if (existingUser) {
-            return res.status(400).json({ message: 'User already exists' });
-        }
+        if (existingUser) return res.status(400).json({ message: 'User already exists' });
 
-        const user = new User({ email, password, name });
+        const hashedPassword = await bcrypt.hash(password, 12);
+        const user = new User({ email, password: hashedPassword, name });
         await user.save();
 
         const token = jwt.sign({ userId: user._id }, process.env.JWT_SECRET);
         res.status(201).json({ token });
     } catch (error) {
-        res.status(500).json({ message: 'Error creating user' });
+        res.status(500).json({ message: 'Server error' });
     }
 });
 
 router.post('/login', async (req, res) => {
     try {
         const { email, password } = req.body;
-        
         const user = await User.findOne({ email });
-        if (!user) {
-            return res.status(400).json({ message: 'User not found' });
-        }
+        if (!user) return res.status(400).json({ message: 'User not found' });
 
         const isMatch = await bcrypt.compare(password, user.password);
-        if (!isMatch) {
-            return res.status(400).json({ message: 'Invalid credentials' });
-        }
+        if (!isMatch) return res.status(400).json({ message: 'Invalid credentials' });
 
         const token = jwt.sign({ userId: user._id }, process.env.JWT_SECRET);
         res.json({ token });
     } catch (error) {
-        res.status(500).json({ message: 'Error logging in' });
+        res.status(500).json({ message: 'Server error' });
+    }
+});
+
+router.put('/profile', auth, async (req, res) => {
+    try {
+        const updates = req.body;
+        const user = await User.findByIdAndUpdate(req.user.userId, updates, { new: true });
+        res.json(user);
+    } catch (error) {
+        res.status(500).json({ message: 'Server error' });
     }
 });
 

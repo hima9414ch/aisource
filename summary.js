@@ -1,37 +1,43 @@
 /*
 API Endpoints Summary:
 
-User Authentication:
-1. POST /api/register
-   - Request: { email: string, password: string, name: string }
-   - Response: { token: string }
+1. User Authentication:
+   - POST /api/user/register
+     Request: { email, password, name }
+     Response: { token }
+   
+   - POST /api/user/login
+     Request: { email, password }
+     Response: { token }
+   
+   - PUT /api/user/profile (Authenticated)
+     Request: { name, email }
+     Response: Updated user object
 
-2. POST /api/login
-   - Request: { email: string, password: string }
-   - Response: { token: string }
+2. Properties:
+   - GET /api/properties
+     Query Parameters: Any property filter
+     Response: Array of properties
+   
+   - GET /api/properties/:id
+     Response: Single property object
+   
+   - POST /api/properties (Authenticated)
+     Request: { title, description, price, location, images, features }
+     Response: Created property object
+   
+   - PUT /api/properties/:id (Authenticated)
+     Request: Property update fields
+     Response: Updated property object
+   
+   - DELETE /api/properties/:id (Authenticated)
+     Response: Success message
 
-Property Management:
-1. GET /api/properties
-   - Description: Fetch all properties
-   - Response: Array of property objects
+3. Contact:
+   - POST /api/contact/submit
+     Request: { name, email, message }
+     Response: Success message
 
-2. POST /api/properties/new
-   - Auth Required: Yes
-   - Request: { title: string, description: string, price: number, location: string }
-   - Response: Created property object
-
-3. GET /api/properties/:id
-   - Description: Fetch single property details
-   - Response: Property object
-
-4. PUT /api/properties/:id
-   - Auth Required: Yes
-   - Request: { title?: string, description?: string, price?: number, location?: string }
-   - Response: Updated property object
-
-5. DELETE /api/properties/:id
-   - Auth Required: Yes
-   - Response: { message: string }
-
-Note: All authenticated routes require Bearer token in Authorization header
+All authenticated routes require 'Authorization: Bearer {token}' header
+All responses include appropriate HTTP status codes
 */
