@@ -5,11 +5,11 @@ const propertySchema = new mongoose.Schema({
   description: { type: String, required: true },
   price: { type: Number, required: true },
   location: { type: String, required: true },
-  type: { type: String, required: true },
-  bedrooms: { type: Number },
-  bathrooms: { type: Number },
-  area: { type: Number },
+  bedrooms: Number,
+  bathrooms: Number,
+  area: Number,
   owner: { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true },
+  images: [String],
   createdAt: { type: Date, default: Date.now },
   updatedAt: { type: Date, default: Date.now }
 });

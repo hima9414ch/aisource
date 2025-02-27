@@ -2,42 +2,42 @@
 API Endpoints Summary:
 
 User Management:
-1. Register User (POST /api/register)
+1. POST /api/register
    - Request: { email, password, name, phone }
-   - Response: { token }
+   - Response: { user, token }
 
-2. Login (POST /api/login)
+2. POST /api/login
    - Request: { email, password }
-   - Response: { token }
+   - Response: { user, token }
 
-3. Get User Details (GET /api/user)
+3. GET /api/user
    - Headers: Authorization: Bearer {token}
-   - Response: { _id, email, name, phone, createdAt }
+   - Response: { user details }
 
-4. Update Profile (PUT /api/user)
+4. PUT /api/user
    - Headers: Authorization: Bearer {token}
-   - Request: { name, phone, email }
-   - Response: Updated user object
+   - Request: { updated user fields }
+   - Response: { updated user details }
 
 Property Management:
-1. Add Property (POST /api/properties)
+1. POST /api/properties
    - Headers: Authorization: Bearer {token}
-   - Request: { title, description, price, location, type, bedrooms, bathrooms, area }
-   - Response: Created property object
+   - Request: { title, description, price, location, bedrooms, bathrooms, area, images }
+   - Response: { property details }
 
-2. List Properties (GET /api/properties)
-   - Query Parameters: type, location, minPrice, maxPrice
-   - Response: Array of property objects
+2. GET /api/properties
+   - Query params: location, minPrice, maxPrice
+   - Response: [{ property details }]
 
-3. Get Property Details (GET /api/properties/:id)
-   - Response: Property object with owner details
+3. GET /api/properties/:id
+   - Response: { property details with owner info }
 
-4. Update Property (PUT /api/properties/:id)
+4. PUT /api/properties/:id
    - Headers: Authorization: Bearer {token}
-   - Request: Property fields to update
-   - Response: Updated property object
+   - Request: { updated property fields }
+   - Response: { updated property details }
 
-5. Delete Property (DELETE /api/properties/:id)
+5. DELETE /api/properties/:id
    - Headers: Authorization: Bearer {token}
-   - Response: 204 No Content
+   - Response: { message: 'Property deleted successfully' }
 */

@@ -43,7 +43,7 @@ router.put('/user', auth, async (req, res) => {
   try {
     const user = await User.findByIdAndUpdate(
       req.user.userId,
-      req.body,
+      { ...req.body },
       { new: true }
     );
     res.json(user);
