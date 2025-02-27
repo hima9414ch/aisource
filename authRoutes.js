@@ -1,50 +1,56 @@
 const express = require('express');
-const router = express.Router();
-const jwt = require('jsonwebtoken');
 const bcrypt = require('bcryptjs');
+const jwt = require('jsonwebtoken');
 const User = require('./userModel');
-const auth = require('./middleware/auth');
+const auth = require('./authMiddleware');
+
+const router = express.Router();
 
 router.post('/register', async (req, res) => {
     try {
-        const { email, password, name } = req.body;
-        const existingUser = await User.findOne({ email });
-        if (existingUser) return res.status(400).json({ message: 'User already exists' });
-
-        const hashedPassword = await bcrypt.hash(password, 12);
-        const user = new User({ email, password: hashedPassword, name });
+        const user = new User(req.body);
         await user.save();
-
         const token = jwt.sign({ userId: user._id }, process.env.JWT_SECRET);
-        res.status(201).json({ token });
+        res.status(201).json({ user, token });
     } catch (error) {
-        res.status(500).json({ message: 'Server error' });
+        res.status(400).json({ error: error.message });
     }
 });
 
 router.post('/login', async (req, res) => {
     try {
-        const { email, password } = req.body;
-        const user = await User.findOne({ email });
-        if (!user) return res.status(400).json({ message: 'User not found' });
+        const user = await User.findOne({ email: req.body.email });
+        if (!user) throw new Error('Invalid login credentials');
 
-        const isMatch = await bcrypt.compare(password, user.password);
-        if (!isMatch) return res.status(400).json({ message: 'Invalid credentials' });
+        const isMatch = await bcrypt.compare(req.body.password, user.password);
+        if (!isMatch) throw new Error('Invalid login credentials');
 
         const token = jwt.sign({ userId: user._id }, process.env.JWT_SECRET);
-        res.json({ token });
+        res.json({ user, token });
     } catch (error) {
-        res.status(500).json({ message: 'Server error' });
+        res.status(400).json({ error: error.message });
     }
 });
 
-router.put('/profile', auth, async (req, res) => {
+router.get('/user', auth, async (req, res) => {
     try {
-        const updates = req.body;
-        const user = await User.findByIdAndUpdate(req.user.userId, updates, { new: true });
+        const user = await User.findById(req.user.userId);
         res.json(user);
     } catch (error) {
-        res.status(500).json({ message: 'Server error' });
+        res.status(500).json({ error: error.message });
+    }
+});
+
+router.put('/user', auth, async (req, res) => {
+    try {
+        const user = await User.findByIdAndUpdate(
+            req.user.userId,
+            req.body,
+            { new: true }
+        );
+        res.json(user);
+    } catch (error) {
+        res.status(400).json({ error: error.message });
     }
 });
 
