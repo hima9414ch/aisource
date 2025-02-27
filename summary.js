@@ -22,15 +22,15 @@ User Management:
 Property Management:
 1. POST /api/properties
    - Headers: Authorization: Bearer {token}
-   - Request: { title, description, price, location, bedrooms, bathrooms, area, images }
+   - Request: { title, description, price, location, features, images }
    - Response: { property details }
 
 2. GET /api/properties
-   - Query params: location, minPrice, maxPrice
+   - Query Parameters: Any property field for filtering
    - Response: [{ property details }]
 
 3. GET /api/properties/:id
-   - Response: { property details with owner info }
+   - Response: { property details }
 
 4. PUT /api/properties/:id
    - Headers: Authorization: Bearer {token}
