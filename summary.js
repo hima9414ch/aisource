@@ -1,40 +1,43 @@
-/**
- * API Endpoints Summary
- *
- * User Routes:
- * POST /api/user/register
- * - Request: { email, password, name, phone }
- * - Response: { token }
- *
- * POST /api/user/login
- * - Request: { email, password }
- * - Response: { token }
- *
- * PUT /api/user/profile (Auth Required)
- * - Request: { name, phone, email }
- * - Response: Updated user object
- *
- * Property Routes:
- * GET /api/properties
- * - Query params: type, location, minPrice, maxPrice
- * - Response: Array of properties
- *
- * GET /api/properties/:id
- * - Response: Single property object with owner details
- *
- * POST /api/properties (Auth Required)
- * - Request: { title, description, price, location, type, bedrooms, bathrooms, area, images }
- * - Response: Created property object
- *
- * PUT /api/properties/:id (Auth Required)
- * - Request: Property fields to update
- * - Response: Updated property object
- *
- * DELETE /api/properties/:id (Auth Required)
- * - Response: Success message
- *
- * Contact Routes:
- * POST /api/contact/submit
- * - Request: { name, email, message, propertyId }
- * - Response: Success message
- */
+/*
+API Endpoints Summary:
+
+1. User Management:
+   - POST /api/register
+     Request: { email, password, name, phone }
+     Response: { message: 'User registered successfully' }
+
+   - POST /api/login
+     Request: { email, password }
+     Response: { token: 'jwt_token' }
+
+   - GET /api/user
+     Headers: { Authorization: 'Bearer token' }
+     Response: { user details excluding password }
+
+   - PUT /api/user
+     Headers: { Authorization: 'Bearer token' }
+     Request: { name, phone }
+     Response: { updated user details }
+
+2. Property Management:
+   - GET /api/properties
+     Query params: status, location (optional)
+     Response: [{ property listings }]
+
+   - GET /api/properties/:id
+     Response: { property details }
+
+   - POST /api/properties
+     Headers: { Authorization: 'Bearer token' }
+     Request: { title, description, price, location, features, images }
+     Response: { created property details }
+
+   - PUT /api/properties/:id
+     Headers: { Authorization: 'Bearer token' }
+     Request: { updated property fields }
+     Response: { updated property details }
+
+   - DELETE /api/properties/:id
+     Headers: { Authorization: 'Bearer token' }
+     Response: { message: 'Property deleted successfully' }
+*/
