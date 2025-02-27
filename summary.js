@@ -16,25 +16,25 @@ User Management:
 
 4. PUT /api/user
    - Headers: Authorization: Bearer {token}
-   - Request: { name, phone, email }
+   - Request: { updated user fields }
    - Response: { updated user details }
 
 Property Management:
 1. POST /api/properties
    - Headers: Authorization: Bearer {token}
-   - Request: { title, description, price, location, bedrooms, bathrooms, area }
+   - Request: { title, description, price, location, bedrooms, bathrooms, area, images }
    - Response: { property details }
 
 2. GET /api/properties
-   - Query Parameters: minPrice, maxPrice, location
-   - Response: [{ property details }]
+   - Query params: minPrice, maxPrice, location
+   - Response: [{ property details with owner info }]
 
 3. GET /api/properties/:id
-   - Response: { property details with owner information }
+   - Response: { property details with owner info }
 
 4. PUT /api/properties/:id
    - Headers: Authorization: Bearer {token}
-   - Request: { title, description, price, location, bedrooms, bathrooms, area }
+   - Request: { updated property fields }
    - Response: { updated property details }
 
 5. DELETE /api/properties/:id
