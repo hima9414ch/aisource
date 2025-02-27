@@ -2,50 +2,44 @@
 API Endpoints Summary:
 
 User Management:
-1. Register User
-   - Endpoint: POST /api/register
-   - Body: { email, password, name }
+1. POST /api/register
+   - Request: { email, password, name, phone }
    - Response: { token, user: { id, email, name } }
 
-2. Login User
-   - Endpoint: POST /api/login
-   - Body: { email, password }
+2. POST /api/login
+   - Request: { email, password }
    - Response: { token, user: { id, email, name } }
 
-3. Get User Details
-   - Endpoint: GET /api/user
+3. GET /api/user
    - Headers: Authorization: Bearer {token}
-   - Response: { id, email, name, createdAt }
+   - Response: User object (excluding password)
 
-4. Update User Profile
-   - Endpoint: PUT /api/user
+4. PUT /api/user
    - Headers: Authorization: Bearer {token}
-   - Body: { name, email }
-   - Response: { id, email, name, createdAt }
+   - Request: Updated user fields
+   - Response: Updated user object
 
 Property Management:
-1. List Properties
-   - Endpoint: GET /api/properties
-   - Response: Array of properties
+1. GET /api/properties
+   - Query Parameters: Any property field for filtering
+   - Response: Array of property objects
 
-2. Get Single Property
-   - Endpoint: GET /api/properties/:id
-   - Response: Property details
+2. GET /api/properties/:id
+   - Response: Single property object
 
-3. Add Property
-   - Endpoint: POST /api/properties
+3. POST /api/properties
    - Headers: Authorization: Bearer {token}
-   - Body: { title, description, price, location }
+   - Request: Property details (title, description, price, location, features, images)
    - Response: Created property object
 
-4. Update Property
-   - Endpoint: PUT /api/properties/:id
+4. PUT /api/properties/:id
    - Headers: Authorization: Bearer {token}
-   - Body: { title, description, price, location }
+   - Request: Updated property fields
    - Response: Updated property object
 
-5. Delete Property
-   - Endpoint: DELETE /api/properties/:id
+5. DELETE /api/properties/:id
    - Headers: Authorization: Bearer {token}
-   - Response: { message: 'Property deleted successfully' }
+   - Response: Success message
+
+All endpoints return appropriate error messages and status codes when needed.
 */
