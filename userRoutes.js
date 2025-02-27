@@ -1,52 +1,60 @@
 const express = require('express');
 const router = express.Router();
+const User = require('./userModel');
 const jwt = require('jsonwebtoken');
 const bcrypt = require('bcryptjs');
-const User = require('./userModel');
-const auth = require('./authMiddleware');
+const authMiddleware = require('./authMiddleware');
 
+// Register
 router.post('/register', async (req, res) => {
   try {
     const user = new User(req.body);
     await user.save();
     const token = jwt.sign({ userId: user._id }, process.env.JWT_SECRET);
-    res.status(201).json({ token });
+    res.status(201).json({ token, user: { email: user.email, name: user.name } });
   } catch (error) {
-    res.status(400).json({ message: error.message });
+    res.status(400).json({ error: 'Error creating user' });
   }
 });
 
+// Login
 router.post('/login', async (req, res) => {
   try {
     const { email, password } = req.body;
     const user = await User.findOne({ email });
-    if (!user || !(await bcrypt.compare(password, user.password))) {
-      return res.status(401).json({ message: 'Invalid credentials' });
-    }
+    if (!user) return res.status(401).json({ error: 'Invalid credentials' });
+
+    const isMatch = await bcrypt.compare(password, user.password);
+    if (!isMatch) return res.status(401).json({ error: 'Invalid credentials' });
+
     const token = jwt.sign({ userId: user._id }, process.env.JWT_SECRET);
-    res.json({ token });
+    res.json({ token, user: { email: user.email, name: user.name } });
   } catch (error) {
-    res.status(400).json({ message: error.message });
+    res.status(500).json({ error: 'Error logging in' });
   }
 });
 
-router.get('/user', auth, async (req, res) => {
+// Get user details
+router.get('/user', authMiddleware, async (req, res) => {
   try {
-    const user = await User.findById(req.user.userId).select('-password');
+    const user = await User.findById(req.user._id).select('-password');
     res.json(user);
   } catch (error) {
-    res.status(400).json({ message: error.message });
+    res.status(500).json({ error: 'Error fetching user details' });
   }
 });
 
-router.put('/user', auth, async (req, res) => {
+// Update user profile
+router.put('/user', authMiddleware, async (req, res) => {
   try {
-    const updates = req.body;
-    delete updates.password;
-    const user = await User.findByIdAndUpdate(req.user.userId, updates, { new: true }).select('-password');
+    const user = await User.findByIdAndUpdate(
+      req.user._id,
+      { $set: req.body },
+      { new: true }
+    ).select('-password');
     res.json(user);
   } catch (error) {
-    res.status(400).json({ message: error.message });
+    res.status(400).json({ error: 'Error updating user profile' });
   }
 });
 
