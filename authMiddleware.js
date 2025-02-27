@@ -1,12 +1,17 @@
 const jwt = require('jsonwebtoken');
+const User = require('./userModel');
 
-const auth = (req, res, next) => {
+module.exports = async (req, res, next) => {
   try {
     const token = req.header('Authorization').replace('Bearer ', '');
     const decoded = jwt.verify(token, process.env.JWT_SECRET);
-    req.user = decoded;
+    const user = await User.findById(decoded.userId);
+    
+    if (!user) throw new Error();
+    
+    req.user = user;
     next();
   } catch (error) {
-    res.status(401).json({ message: 'Authentication required' });
+    res.status(401).json({ error: 'Please authenticate' });
   }
 };
