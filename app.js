@@ -3,7 +3,7 @@ const mongoose = require('mongoose');
 const cors = require('cors');
 require('dotenv').config();
 
-const authRoutes = require('./authRoutes');
+const userRoutes = require('./userRoutes');
 const propertyRoutes = require('./propertyRoutes');
 
 const app = express();
@@ -15,7 +15,7 @@ mongoose.connect(process.env.MONGODB_URI)
   .then(() => console.log('Connected to MongoDB'))
   .catch(err => console.error('MongoDB connection error:', err));
 
-app.use('/api', authRoutes);
+app.use('/api', userRoutes);
 app.use('/api', propertyRoutes);
 
 app.use((err, req, res, next) => {

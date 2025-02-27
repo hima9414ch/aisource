@@ -1,42 +1,43 @@
 /*
 API Endpoints Summary:
 
-User Management:
-1. POST /api/register
-   - Request: { email, password, name, phone }
-   - Response: { user, token }
+1. User Management:
+   - POST /api/register
+     Request: { email, password, name, phone }
+     Response: { token }
 
-2. POST /api/login
-   - Request: { email, password }
-   - Response: { user, token }
+   - POST /api/login
+     Request: { email, password }
+     Response: { token }
 
-3. GET /api/user
-   - Headers: Authorization: Bearer <token>
-   - Response: { user details excluding password }
+   - GET /api/user
+     Headers: { Authorization: 'Bearer <token>' }
+     Response: { _id, email, name, phone, createdAt }
 
-4. PUT /api/user
-   - Headers: Authorization: Bearer <token>
-   - Request: { name, phone, email }
-   - Response: { updated user details }
+   - PUT /api/user
+     Headers: { Authorization: 'Bearer <token>' }
+     Request: { name, phone, email }
+     Response: { _id, email, name, phone, createdAt }
 
-Property Management:
-1. GET /api/properties
-   - Response: [{ property list with owner details }]
+2. Property Management:
+   - POST /api/properties
+     Headers: { Authorization: 'Bearer <token>' }
+     Request: { title, description, price, location, bedrooms, bathrooms, area, images }
+     Response: Property object
 
-2. GET /api/properties/:id
-   - Response: { detailed property information }
+   - GET /api/properties
+     Query params: minPrice, maxPrice, location
+     Response: Array of property objects
 
-3. POST /api/properties
-   - Headers: Authorization: Bearer <token>
-   - Request: { title, description, price, location, features, images }
-   - Response: { created property details }
+   - GET /api/properties/:id
+     Response: Property object with owner details
 
-4. PUT /api/properties/:id
-   - Headers: Authorization: Bearer <token>
-   - Request: { title, description, price, location, features, images }
-   - Response: { updated property details }
+   - PUT /api/properties/:id
+     Headers: { Authorization: 'Bearer <token>' }
+     Request: { title, description, price, location, bedrooms, bathrooms, area, images }
+     Response: Updated property object
 
-5. DELETE /api/properties/:id
-   - Headers: Authorization: Bearer <token>
-   - Response: { message: 'Property deleted successfully' }
+   - DELETE /api/properties/:id
+     Headers: { Authorization: 'Bearer <token>' }
+     Response: { message: 'Property deleted successfully' }
 */
