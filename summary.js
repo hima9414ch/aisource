@@ -2,42 +2,42 @@
 API Endpoints Summary:
 
 User Management:
-1. POST /api/register
+1. Register User (POST /api/register)
    - Request: { email, password, name, phone }
    - Response: { token }
 
-2. POST /api/login
+2. Login (POST /api/login)
    - Request: { email, password }
    - Response: { token }
 
-3. GET /api/user
+3. Get User Details (GET /api/user)
    - Headers: Authorization: Bearer {token}
-   - Response: User details (excluding password)
+   - Response: { _id, email, name, phone, createdAt }
 
-4. PUT /api/user
+4. Update Profile (PUT /api/user)
    - Headers: Authorization: Bearer {token}
-   - Request: Updated user fields
-   - Response: Updated user details
+   - Request: { name, phone, email }
+   - Response: Updated user object
 
 Property Management:
-1. GET /api/properties
-   - Query Parameters: Any property filter
-   - Response: Array of properties
-
-2. GET /api/properties/:id
-   - Response: Single property details
-
-3. POST /api/properties
+1. Add Property (POST /api/properties)
    - Headers: Authorization: Bearer {token}
-   - Request: Property details (title, description, price, location, features, images)
-   - Response: Created property
+   - Request: { title, description, price, location, type, bedrooms, bathrooms, area }
+   - Response: Created property object
 
-4. PUT /api/properties/:id
-   - Headers: Authorization: Bearer {token}
-   - Request: Updated property fields
-   - Response: Updated property
+2. List Properties (GET /api/properties)
+   - Query Parameters: type, location, minPrice, maxPrice
+   - Response: Array of property objects
 
-5. DELETE /api/properties/:id
+3. Get Property Details (GET /api/properties/:id)
+   - Response: Property object with owner details
+
+4. Update Property (PUT /api/properties/:id)
    - Headers: Authorization: Bearer {token}
-   - Response: Success message
+   - Request: Property fields to update
+   - Response: Updated property object
+
+5. Delete Property (DELETE /api/properties/:id)
+   - Headers: Authorization: Bearer {token}
+   - Response: 204 No Content
 */
