@@ -1,56 +1,58 @@
 const express = require('express');
 const router = express.Router();
-const jwt = require('jsonwebtoken');
-const bcrypt = require('bcryptjs');
 const User = require('./userModel');
-const authMiddleware = require('./authMiddleware');
+const bcrypt = require('bcryptjs');
+const jwt = require('jsonwebtoken');
+const auth = require('./authMiddleware');
 
+// Register
 router.post('/register', async (req, res) => {
   try {
     const user = new User(req.body);
     await user.save();
-    const token = jwt.sign({ userId: user._id }, process.env.JWT_SECRET);
-    res.status(201).json({ token });
+    const token = jwt.sign({ _id: user._id }, process.env.JWT_SECRET);
+    res.status(201).json({ user, token });
   } catch (error) {
-    res.status(400).json({ error: error.message });
+    res.status(400).json({ error: 'Error creating user' });
   }
 });
 
+// Login
 router.post('/login', async (req, res) => {
   try {
-    const { email, password } = req.body;
-    const user = await User.findOne({ email });
-    if (!user || !await bcrypt.compare(password, user.password)) {
-      return res.status(401).json({ error: 'Invalid credentials' });
-    }
-    const token = jwt.sign({ userId: user._id }, process.env.JWT_SECRET);
-    res.json({ token });
+    const user = await User.findOne({ email: req.body.email });
+    if (!user) return res.status(401).json({ error: 'Invalid credentials' });
+    
+    const isMatch = await bcrypt.compare(req.body.password, user.password);
+    if (!isMatch) return res.status(401).json({ error: 'Invalid credentials' });
+    
+    const token = jwt.sign({ _id: user._id }, process.env.JWT_SECRET);
+    res.json({ user, token });
   } catch (error) {
-    res.status(400).json({ error: error.message });
+    res.status(500).json({ error: 'Error logging in' });
   }
 });
 
-router.get('/user', authMiddleware, async (req, res) => {
+// Get user details
+router.get('/user', auth, async (req, res) => {
   try {
-    const user = await User.findById(req.user.userId).select('-password');
+    const user = await User.findById(req.user._id).select('-password');
     res.json(user);
   } catch (error) {
-    res.status(400).json({ error: error.message });
+    res.status(500).json({ error: 'Error fetching user details' });
   }
 });
 
-router.put('/user', authMiddleware, async (req, res) => {
+// Update profile
+router.put('/user', auth, async (req, res) => {
   try {
-    const updates = req.body;
-    delete updates.password;
-    const user = await User.findByIdAndUpdate(
-      req.user.userId,
-      updates,
-      { new: true }
-    ).select('-password');
+    const updates = Object.keys(req.body);
+    const user = await User.findById(req.user._id);
+    updates.forEach(update => user[update] = req.body[update]);
+    await user.save();
     res.json(user);
   } catch (error) {
-    res.status(400).json({ error: error.message });
+    res.status(400).json({ error: 'Error updating profile' });
   }
 });
 
