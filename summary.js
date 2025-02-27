@@ -2,42 +2,50 @@
 API Endpoints Summary:
 
 User Management:
-1. POST /api/register
-   - Request: { email, password, name }
-   - Response: { message: 'User registered successfully' }
+1. Register User
+   - Endpoint: POST /api/register
+   - Body: { email, password, name }
+   - Response: { token, user: { id, email, name } }
 
-2. POST /api/login
-   - Request: { email, password }
-   - Response: { token }
+2. Login User
+   - Endpoint: POST /api/login
+   - Body: { email, password }
+   - Response: { token, user: { id, email, name } }
 
-3. GET /api/user
+3. Get User Details
+   - Endpoint: GET /api/user
    - Headers: Authorization: Bearer {token}
-   - Response: { _id, email, name, createdAt }
+   - Response: { id, email, name, createdAt }
 
-4. PUT /api/user
+4. Update User Profile
+   - Endpoint: PUT /api/user
    - Headers: Authorization: Bearer {token}
-   - Request: { name, email }
-   - Response: { _id, email, name, createdAt }
+   - Body: { name, email }
+   - Response: { id, email, name, createdAt }
 
 Property Management:
-1. POST /api/properties
+1. List Properties
+   - Endpoint: GET /api/properties
+   - Response: Array of properties
+
+2. Get Single Property
+   - Endpoint: GET /api/properties/:id
+   - Response: Property details
+
+3. Add Property
+   - Endpoint: POST /api/properties
    - Headers: Authorization: Bearer {token}
-   - Request: { title, description, price, location }
-   - Response: Property object
+   - Body: { title, description, price, location }
+   - Response: Created property object
 
-2. GET /api/properties
-   - Query Parameters: Any property field
-   - Response: Array of property objects
-
-3. GET /api/properties/:id
-   - Response: Property object
-
-4. PUT /api/properties/:id
+4. Update Property
+   - Endpoint: PUT /api/properties/:id
    - Headers: Authorization: Bearer {token}
-   - Request: Any property field to update
+   - Body: { title, description, price, location }
    - Response: Updated property object
 
-5. DELETE /api/properties/:id
+5. Delete Property
+   - Endpoint: DELETE /api/properties/:id
    - Headers: Authorization: Bearer {token}
    - Response: { message: 'Property deleted successfully' }
 */
