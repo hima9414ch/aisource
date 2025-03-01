@@ -1,50 +1,53 @@
 /*
 API Endpoints Summary:
 
-1. User Registration
-   - Endpoint: POST /api/users/register
-   - Request Body: { username, email, password }
-   - Response: { message: 'User registered successfully' }
+1. Authentication APIs:
+   - POST /api/auth/register
+     Request: { email: string, password: string, name: string }
+     Response: { message: string }
 
-2. User Login
-   - Endpoint: POST /api/users/login
-   - Request Body: { email, password }
-   - Response: { token: 'jwt-token' }
+   - POST /api/auth/login
+     Request: { email: string, password: string }
+     Response: { token: string }
 
-3. Get User Profile
-   - Endpoint: GET /api/users/profile
-   - Headers: Authorization: Bearer <token>
-   - Response: { user profile data }
+   - POST /api/auth/logout
+     Response: { message: string }
 
-4. Update User Profile
-   - Endpoint: PUT /api/users/profile/update
-   - Headers: Authorization: Bearer <token>
-   - Request Body: { username, email, phone }
-   - Response: { updated user data }
+2. Property APIs:
+   - GET /api/properties
+     Query Parameters: Any property field for filtering
+     Response: Array of property objects
 
-5. Get Properties List
-   - Endpoint: GET /api/properties
-   - Query Parameters: location, price_range, type
-   - Response: [{ property listings }]
+   - POST /api/properties
+     Request: {
+       title: string,
+       description: string,
+       price: number,
+       location: string,
+       bedrooms: number,
+       bathrooms: number,
+       area: number,
+       type: string
+     }
+     Response: Created property object
 
-6. Get Property Details
-   - Endpoint: GET /api/properties/:id
-   - Response: { property details }
+   - GET /api/properties/:id
+     Response: Property object
 
-7. Create Property (Admin)
-   - Endpoint: POST /api/properties/create
-   - Headers: Authorization: Bearer <token>
-   - Request Body: { title, description, price, location, images, property_type }
-   - Response: { created property data }
+   - PUT /api/properties/:id
+     Request: Updated property fields
+     Response: Updated property object
 
-8. Update Property (Admin)
-   - Endpoint: PUT /api/properties/update/:id
-   - Headers: Authorization: Bearer <token>
-   - Request Body: { title, description, price, location, images, property_type, availability }
-   - Response: { updated property data }
+   - DELETE /api/properties/:id
+     Response: { message: string }
 
-9. Delete Property (Admin)
-   - Endpoint: DELETE /api/properties/delete/:id
-   - Headers: Authorization: Bearer <token>
-   - Response: { message: 'Property deleted successfully' }
+3. User Profile APIs:
+   - GET /api/user/profile
+     Response: User object (excluding password)
+
+   - PUT /api/user/profile
+     Request: Updated user fields
+     Response: Updated user object (excluding password)
+
+Note: All APIs except /api/auth/* require Bearer token authentication
 */
