@@ -5,12 +5,10 @@ const propertySchema = new mongoose.Schema({
   description: { type: String, required: true },
   price: { type: Number, required: true },
   location: { type: String, required: true },
-  type: { type: String, enum: ['house', 'apartment', 'commercial'], required: true },
-  features: [String],
-  owner: { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true },
-  status: { type: String, enum: ['available', 'sold', 'rented'], default: 'available' }
+  images: [{ type: String }],
+  property_type: { type: String, required: true },
+  availability: { type: Boolean, default: true },
+  created_by: { type: mongoose.Schema.Types.ObjectId, ref: 'User' }
 }, { timestamps: true });
 
-const Property = mongoose.model('Property', propertySchema);
-
-module.exports = Property;
+module.exports = mongoose.model('Property', propertySchema);

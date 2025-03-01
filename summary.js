@@ -1,47 +1,50 @@
 /*
 API Endpoints Summary:
 
-1. Authentication APIs:
-   - POST /api/auth/register
-     Request: { username: string, password: string }
-     Response: { message: string }
+1. User Registration
+   - Endpoint: POST /api/users/register
+   - Request Body: { username, email, password }
+   - Response: { message: 'User registered successfully' }
 
-   - POST /api/auth/login
-     Request: { username: string, password: string }
-     Response: { token: string }
+2. User Login
+   - Endpoint: POST /api/users/login
+   - Request Body: { email, password }
+   - Response: { token: 'jwt-token' }
 
-   - GET /api/auth/logout
-     Response: { message: string }
+3. Get User Profile
+   - Endpoint: GET /api/users/profile
+   - Headers: Authorization: Bearer <token>
+   - Response: { user profile data }
 
-2. Product APIs:
-   - GET /api/products
-     Query params: category?, search?
-     Response: Array of products
+4. Update User Profile
+   - Endpoint: PUT /api/users/profile/update
+   - Headers: Authorization: Bearer <token>
+   - Request Body: { username, email, phone }
+   - Response: { updated user data }
 
-   - GET /api/products/:id
-     Response: Single product object
+5. Get Properties List
+   - Endpoint: GET /api/properties
+   - Query Parameters: location, price_range, type
+   - Response: [{ property listings }]
 
-   - POST /api/products (Admin only)
-     Request: { name: string, description: string, price: number, category: string, stock: number, imageUrl?: string }
-     Response: Created product object
+6. Get Property Details
+   - Endpoint: GET /api/properties/:id
+   - Response: { property details }
 
-   - PUT /api/products/:id (Admin only)
-     Request: { name?, description?, price?, category?, stock?, imageUrl? }
-     Response: Updated product object
+7. Create Property (Admin)
+   - Endpoint: POST /api/properties/create
+   - Headers: Authorization: Bearer <token>
+   - Request Body: { title, description, price, location, images, property_type }
+   - Response: { created property data }
 
-   - DELETE /api/products/:id (Admin only)
-     Response: { message: string }
+8. Update Property (Admin)
+   - Endpoint: PUT /api/properties/update/:id
+   - Headers: Authorization: Bearer <token>
+   - Request Body: { title, description, price, location, images, property_type, availability }
+   - Response: { updated property data }
 
-3. Order APIs:
-   - POST /api/orders
-     Request: { products: Array<{ product: ObjectId, quantity: number }>, totalAmount: number }
-     Response: Created order object
-
-   - GET /api/orders/:id
-     Response: Single order object with populated products
-
-   - GET /api/orders/user/:userId
-     Response: Array of orders for specific user
-
-All protected routes require Authorization header with Bearer token.
+9. Delete Property (Admin)
+   - Endpoint: DELETE /api/properties/delete/:id
+   - Headers: Authorization: Bearer <token>
+   - Response: { message: 'Property deleted successfully' }
 */

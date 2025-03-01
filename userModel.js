@@ -3,7 +3,9 @@ const bcrypt = require('bcryptjs');
 
 const userSchema = new mongoose.Schema({
   username: { type: String, required: true, unique: true },
+  email: { type: String, required: true, unique: true },
   password: { type: String, required: true },
+  phone: { type: String },
   isAdmin: { type: Boolean, default: false }
 }, { timestamps: true });
 
@@ -23,10 +25,10 @@ async function createDefaultAdmin() {
     if (!adminExists) {
       await User.create({
         username: 'admin',
+        email: 'admin',
         password: 'admin',
         isAdmin: true
       });
-      console.log('Default admin user created');
     }
   } catch (error) {
     console.error('Error creating default admin:', error);
