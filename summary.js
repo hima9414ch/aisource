@@ -1,49 +1,47 @@
 /*
 API Endpoints Summary:
 
-1. User Authentication:
-   - POST /api/users/register
+1. Authentication APIs:
+   - POST /api/auth/register
      Request: { username: string, password: string }
-     Response: { token: string }
-   
-   - POST /api/users/login
+     Response: { message: string }
+
+   - POST /api/auth/login
      Request: { username: string, password: string }
      Response: { token: string }
 
-2. Blog Posts:
-   - GET /api/posts
-     Query Params: { category?: string }
-     Response: Array of posts with author details
-   
-   - GET /api/posts/:userId
-     Response: Array of posts by specific user
-   
-   - POST /api/posts
-     Headers: { Authorization: 'Bearer <token>' }
-     Request: { title: string, content: string, category?: string }
-     Response: Created post object
-   
-   - PUT /api/posts/:postId
-     Headers: { Authorization: 'Bearer <token>' }
-     Request: { title?: string, content?: string, category?: string }
-     Response: Updated post object
-   
-   - DELETE /api/posts/:postId
-     Headers: { Authorization: 'Bearer <token>' }
+   - GET /api/auth/logout
      Response: { message: string }
 
-3. Comments:
-   - POST /api/comments/:postId
-     Headers: { Authorization: 'Bearer <token>' }
-     Request: { content: string }
-     Response: Created comment object
-   
-   - PUT /api/comments/:commentId
-     Headers: { Authorization: 'Bearer <token>' }
-     Request: { content: string }
-     Response: Updated comment object
-   
-   - DELETE /api/comments/:commentId
-     Headers: { Authorization: 'Bearer <token>' }
+2. Product APIs:
+   - GET /api/products
+     Query params: category?, search?
+     Response: Array of products
+
+   - GET /api/products/:id
+     Response: Single product object
+
+   - POST /api/products (Admin only)
+     Request: { name: string, description: string, price: number, category: string, stock: number, imageUrl?: string }
+     Response: Created product object
+
+   - PUT /api/products/:id (Admin only)
+     Request: { name?, description?, price?, category?, stock?, imageUrl? }
+     Response: Updated product object
+
+   - DELETE /api/products/:id (Admin only)
      Response: { message: string }
+
+3. Order APIs:
+   - POST /api/orders
+     Request: { products: Array<{ product: ObjectId, quantity: number }>, totalAmount: number }
+     Response: Created order object
+
+   - GET /api/orders/:id
+     Response: Single order object with populated products
+
+   - GET /api/orders/user/:userId
+     Response: Array of orders for specific user
+
+All protected routes require Authorization header with Bearer token.
 */
